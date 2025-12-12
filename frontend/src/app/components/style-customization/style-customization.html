@@ -1,0 +1,27 @@
+<app-navbar></app-navbar>
+
+<!-- FLOTANTE DERECHA -->
+<div class="floating-info">
+  <div class="error-circle" style="--percent: 25%;">
+    <span>25% Error</span>
+  </div>
+
+  <!--poner la funcionalidad de descarga ojo -->
+
+  <a class="download-btn" >
+    Descargar reporte
+  </a>
+</div>
+
+<div class="viewer-container">
+
+  <div class="header">
+    <h1>Visualiza tu documento</h1>
+    <p>Revisa el contenido extraído del archivo.</p>
+  </div>
+
+  <div class="document-box">
+    <pre>{{ documentContent }}</pre>
+  </div>
+
+</div>

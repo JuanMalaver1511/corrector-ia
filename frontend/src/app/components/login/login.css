@@ -1,0 +1,156 @@
+/* contenedor principal: pantalla dividida */
+.split-page {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* lado izquierdo: solo imagen */
+.left-side {
+  flex: 1 1 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #eef2ff 0%, #f7fbff 100%);
+  position: relative;
+}
+
+/* ajuste del contenedor de imagen para centrar y recortar */
+.login-image {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-image img {
+  width: 100%;
+  height: 100vh;            /* ocupa toda la altura visible del lado izquierdo */
+  object-fit: cover;        /* recorta manteniendo aspecto */
+  display: block;
+}
+
+/* lado derecho: login */
+.right-side {
+  flex: 1 1 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ececec;
+  padding: 2.5rem;
+}
+
+/* caja del login (más grande y moderna) */
+.login-container {
+  width: 420px;             /* más grande que antes */
+  max-width: 95%;
+  padding: 2.2rem;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), #ffffff);
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(20,30,70,0.08);
+  border: 1px solid rgba(63,81,181,0.06);
+}
+
+/* título */
+.login-container h2{
+  margin: 0 0 1.25rem 0;
+  font-size: 1.6rem;
+  color: #2f3a8f;
+  text-align: center;
+}
+
+/* campos */
+.login-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+label {
+  font-size: 0.95rem;
+  margin-bottom: 0.35rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.input {
+  padding: 0.85rem;
+  border-radius: 10px;
+  border: 1px solid #e0e6f0;
+  font-size: 1rem;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  background: #fbfcff;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #3f51b5;
+  box-shadow: 0 6px 18px rgba(63,81,181,0.08);
+}
+
+/* botón */
+.btn-login {
+  width: 100%;
+  padding: 0.95rem;
+  margin-top: 0.4rem;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(90deg, #3f51b5, #2c3e9f);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(44,62,159,0.12);
+  transition: transform 0.12s ease, box-shadow 0.12s;
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(44,62,159,0.16);
+}
+
+/* mensaje de error */
+.error-message {
+  margin-top: 0.9rem;
+  color: #b00020;
+  font-size: 0.95rem;
+  text-align: center;
+}
+.password-link{
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #3f51b5;
+  text-align: center;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+/* RESPONSIVE: en pantallas pequeñas apilar verticalmente */
+@media (max-width: 900px) {
+  .split-page {
+    flex-direction: column;
+  }
+
+  .left-side {
+    height: 40vh;
+  }
+
+  .login-image img {
+    height: 40vh;
+  }
+
+  .right-side {
+    padding: 2rem 1rem;
+  }
+
+  .login-container {
+    width: 100%;
+    border-radius: 12px;
+    padding: 1.6rem;
+  }
+}

@@ -1,0 +1,169 @@
+.logo img {
+  max-height: 50px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;   /* Alinea TODO verticalmente */
+  padding: 1rem 2.5rem;
+  background: linear-gradient(135deg, #2f41a3 0%, #1e2d7a 100%);
+  color: white;
+  box-shadow: 0 4px 20px rgba(47, 65, 163, 0.25);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  backdrop-filter: blur(10px);
+}
+/* Alinea solo el contenido directo, NO todo el nav */
+.navbar > * {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo:hover {
+  transform: translateY(-1px);
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.menu {
+  display: flex;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.menu a::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: white;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.menu a:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.menu a:hover::before {
+  width: 80%;
+}
+
+/* Botón logout */
+
+
+
+/* Contenedor general */
+.user-menu {
+  position: relative;
+}
+
+/* Botón usuario */
+.user-btn {
+  color: #ffff;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+
+/* Estilos del menú */
+.dropdown {
+  color: #000;
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  min-width: 150px;
+  padding: 10px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  display: none;
+  flex-direction: column;
+  z-index: 10;
+}
+
+/* Mostrar menú cuando la clase active está presente */
+.dropdown.active {
+  display: flex;
+}
+
+.dropdown a,
+.dropdown button {
+  padding: 10px 15px;
+  text-align: left;
+  background: transparent;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.dropdown a:hover,
+.dropdown button:hover {
+  background: #f0f0f0;
+  color: #000;
+}
+
+.dropdown a{
+  color: #1a1919;
+}
+.dropdown svg {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-right: 8px;
+  
+}
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem 1.5rem;
+  }
+  
+  .menu {
+    gap: 0.25rem;
+  }
+  
+  .menu a {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .logo {
+    font-size: 1.3rem;
+  }
+}

@@ -1,0 +1,19 @@
+/* === GLOBAL RESET CLEAN & MINIMAL === */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif !important;
+  letter-spacing: -0.2px;
+}
+
+/* Opcional: mejora del renderizado de texto */
+html, body {
+  background-color: #f9fafb;
+  color: #111827;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}

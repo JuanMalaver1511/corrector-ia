@@ -1,0 +1,200 @@
+/* Contenedor general */
+.dashboard-grid a{
+  text-decoration: none;
+  color: inherit;
+}
+.dashboard-container {
+  padding: 3rem 2.5rem;
+  max-width: 1280px;
+  margin: 0 auto;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #ffffff;
+  min-height: 100vh;
+}
+
+/* Header */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #0a0a0a;
+  letter-spacing: -1px;
+}
+
+/* Grid de tarjetas */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+/* Tarjetas */
+.card {
+  background: #f7f7f7;
+  border-radius: 12px;
+  padding: 2.25rem;
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.05),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #0a0a0a;
+  transform: scaleX(0);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.card:hover::before {
+  transform: scaleX(1);
+}
+
+.card h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #666666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.75rem;
+}
+
+.card p {
+  margin: 0;
+  color: #404040;
+  font-size: 1rem;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+/* Métrica principal */
+.card .metric {
+  display: block;
+  font-size: 2.75rem;
+  font-weight: 700;
+  color: #0a0a0a;
+  margin: 1.25rem 0 0.75rem 0;
+  letter-spacing: -2px;
+  line-height: 1;
+}
+
+/* Etiqueta pequeña */
+.card .label {
+  display: inline-block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #999999;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+/* Cambio o tendencia */
+.card .change {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 0.75rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  background: #f5f5f5;
+  color: #404040;
+}
+
+.card .change.positive {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.card .change.negative {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+/* Icono decorativo opcional */
+.card .icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  font-size: 1.5rem;
+  color: #0a0a0a;
+}
+
+/* Variantes de tarjetas */
+.card.accent-blue::before {
+  background: #2563eb;
+}
+
+.card.accent-purple::before {
+  background: #9333ea;
+}
+
+.card.accent-green::before {
+  background: #16a34a;
+}
+
+.card.accent-orange::before {
+  background: #ea580c;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 2rem 1.5rem;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .dashboard-header h1 {
+    font-size: 1.75rem;
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .card {
+    padding: 1.75rem;
+  }
+  
+  .card .metric {
+    font-size: 2.25rem;
+  }
+}
