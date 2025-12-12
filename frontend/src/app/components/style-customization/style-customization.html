@@ -13,6 +13,14 @@
   </a>
 </div>
 
+<button (click)="corregirDocumento()">Corregir Documento</button>
+
+<div *ngIf="resultadoCorreccion">
+  <h3>Correcciones:</h3>
+  <pre>{{ resultadoCorreccion | json }}</pre>
+</div>
+
+
 <div class="viewer-container">
 
   <div class="header">

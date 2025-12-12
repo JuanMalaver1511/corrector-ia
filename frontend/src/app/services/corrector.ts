@@ -7,13 +7,12 @@ import { Observable } from 'rxjs';
 })
 export class CorrectorService {
 
-  private API_URL = 'http://127.0.0.1:8000';  // tu backend FastAPI
+  private apiUrl = 'http://localhost:8000/ia/corregir'; // Ajusta tu URL
 
   constructor(private http: HttpClient) {}
 
-  corregirTexto(texto: string): Observable<any> {
-    return this.http.post(`${this.API_URL}/corregir`, {
-      texto: texto
-    });
+  // ejemplo: enviar el contenido a la API
+  analizarDocumento(texto: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/ia/corregir`, { texto });
   }
 }
