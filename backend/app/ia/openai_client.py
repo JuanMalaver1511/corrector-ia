@@ -15,7 +15,7 @@ def corregir_chunk(texto):
         messages=[
             {
                 "role": "system",
-                "content": "Corrige ortografía, gramática y estilo sin resumir."
+                "content": "Corrige ortografía, gramática y estilo sin resumir. Devuelve solo el texto corregido. pero inicia con 'Texto corregido: '"
             },
             {
                 "role": "user",
