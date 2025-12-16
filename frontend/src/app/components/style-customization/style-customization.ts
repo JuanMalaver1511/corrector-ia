@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Navbar } from '../navbar/navbar';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CorrectorService } from '../../services/corrector';
+import { finalize, timeout } from 'rxjs/operators';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+
 
 @Component({
   selector: 'app-style-customization',
@@ -13,21 +16,27 @@ import { CorrectorService } from '../../services/corrector';
 })
 export class StyleCustomization implements OnInit {
 
-  // Texto original
+  // 📄 Texto original
   documentContent: string = '';
 
-  // Texto con errores resaltados (HTML)
-  documentContentHTML: string = '';
+  // 🖍 Texto con errores resaltados (HTML)
+  documentContentHTML: SafeHtml = '';
 
-  // Respuesta completa de la IA
+  // 🤖 Respuesta de la IA
   resultadoCorreccion: any = null;
 
-  loading: boolean = false;
+  // ⏳ Estado de carga
+  loading = false;
 
-  // Porcentaje de errores
-  errorPercent: number = 0;
+  // 📊 Porcentaje de errores
+  errorPercent = 0;
 
-  constructor(private correctorService: CorrectorService) {}
+constructor(
+  private correctorService: CorrectorService,
+  private sanitizer: DomSanitizer,
+  private cdr: ChangeDetectorRef
+) {}
+
 
   ngOnInit(): void {
     const content = localStorage.getItem('uploadedDocument');
@@ -37,101 +46,109 @@ export class StyleCustomization implements OnInit {
       : 'No se encontró ningún documento cargado.';
 
     this.documentContentHTML = this.documentContent;
+    this.errorPercent = 0;
   }
 
-  // 🚀 Llamada a la IA
+  // 🚀 Ejecutar corrección con IA
   corregirDocumento(): void {
-    if (!this.documentContent) return;
+    if (!this.documentContent || this.loading) return;
 
     this.loading = true;
+    this.errorPercent = 0;
     this.resultadoCorreccion = null;
 
-    this.correctorService.analizarDocumento(this.documentContent).subscribe({
-      next: (res: any) => {
-        this.resultadoCorreccion = res;
+    this.correctorService
+      .analizarDocumento(this.documentContent)
+      .pipe(
+        timeout(60000), // ⏱ máximo 60s
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges(); // 🔥 fuerza render
+        })
+      )
+      .subscribe({
+        next: (res: any) => {
 
-        this.marcarErrores();
-        this.calcularPorcentaje();
+          // 🔐 Normalizar respuesta
+          if (typeof res === 'string') {
+            try {
+              res = JSON.parse(res);
+            } catch {
+              console.warn('La respuesta no es JSON válido');
+              return;
+            }
+          }
 
-        console.log('Resultado IA:', res);
-      },
-      error: (err) => {
-        console.error('Error en API:', err);
-      },
-      complete: () => {
-        this.loading = false;
-      }
-    });
+          this.resultadoCorreccion = res;
+
+          this.marcarErrores();
+          this.calcularPorcentaje();
+
+          this.cdr.detectChanges(); // 🔥 render inmediato
+        },
+        error: (err) => {
+          console.error('Error en la corrección:', err);
+        }
+      });
   }
 
-  // 🔴 Marca los errores dentro del texto
-  marcarErrores(): void {
-    let texto = this.documentContent;
+marcarErrores(): void {
+  let texto = this.documentContent;
 
-    if (!this.resultadoCorreccion?.errores) {
-      this.documentContentHTML = texto;
-      return;
-    }
-
-    this.resultadoCorreccion.errores.forEach((err: any) => {
-      const palabra = err.original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(`\\b${palabra}\\b`, 'g');
-
-      texto = texto.replace(
-        regex,
-        `<span class="error"
-              title="Corrección: ${err.correccion} | ${err.motivo}">
-          ${err.original}
-         </span>`
-      );
-    });
-
-    this.documentContentHTML = texto;
+  if (!this.resultadoCorreccion?.errores?.length) {
+    this.documentContentHTML =
+      this.sanitizer.bypassSecurityTrustHtml(texto);
+    return;
   }
+
+  this.resultadoCorreccion.errores.forEach((err: any) => {
+    if (!err.original) return;
+
+    const palabra = err.original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`\\b${palabra}\\b`, 'gi');
+
+    texto = texto.replace(
+      regex,
+      `<span class="error"
+        title="Corrección: ${err.correccion || ''} ${err.motivo || ''}">
+        ${err.original}
+      </span>`
+    );
+  });
+
+  this.documentContentHTML =
+    this.sanitizer.bypassSecurityTrustHtml(texto);
+}
+
 
   calcularPorcentaje(): void {
-    if (!this.resultadoCorreccion?.errores?.length) {
-      this.errorPercent = 0;
-      return;
-    }
+    const errores = this.resultadoCorreccion?.errores?.length || 0;
 
-    const totalPalabras = this.documentContent.trim().split(/\s+/).length;
-    const totalErrores = this.resultadoCorreccion.errores.length;
+    const palabras = this.documentContent
+      .trim()
+      .split(/\s+/)
+      .filter(p => p.length > 0).length;
 
-    this.errorPercent = totalPalabras
-      ? Math.min(100, Math.round((totalErrores / totalPalabras) * 100))
+    this.errorPercent = palabras
+      ? Math.min(100, Math.round((errores / palabras) * 100))
       : 0;
   }
 
-  descargarReporte(): void {
-    if (!this.resultadoCorreccion) return;
-
-    const data = JSON.stringify(this.resultadoCorreccion, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'reporte-correccion.json';
-    a.click();
-
-    window.URL.revokeObjectURL(url);
-  }
-
+  // 📥 Descargar documento corregido
   descargarDocumentoCorregido(): void {
     if (!this.resultadoCorreccion?.corregido) return;
 
     const blob = new Blob(
       [this.resultadoCorreccion.corregido],
-      { type: 'text/plain;charset=utf-8;' }
+      { type: 'text/plain;charset=utf-8' }
     );
 
-    const url = window.URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = 'documento-corregido.txt';
     a.click();
 
-    window.URL.revokeObjectURL(url);
+    URL.revokeObjectURL(url);
   }
 }

@@ -1,32 +1,39 @@
 <app-navbar></app-navbar>
 
-<!-- FLOTANTE DERECHA -->
+<!-- FLOTANTE DERECHA: PORCENTAJE -->
 <div class="floating-info" aria-label="Estado del documento">
-  <div class="error-circle" [style.--percent]="errorPercent + '%'" role="progressbar"
-       [attr.aria-valuenow]="errorPercent" aria-valuemin="0" aria-valuemax="100">
+  <div
+    class="error-circle"
+    [ngStyle]="{ '--percent': errorPercent + '%' }"
+    role="progressbar"
+    [attr.aria-valuenow]="errorPercent"
+    aria-valuemin="0"
+    aria-valuemax="100"
+  >
     <span>{{ errorPercent }}% Error</span>
   </div>
-
-  <!-- Descarga del reporte -->
-  <button class="download-btn" type="button" (click)="descargarReporte()" [disabled]="!resultadoCorreccion">
-    Descargar reporte
-  </button>
 </div>
 
-<!-- Acciones principales -->
+<!-- ACCIONES -->
 <div class="actions">
-  <button type="button" (click)="corregirDocumento()" [disabled]="loading">
+  <button
+    type="button"
+    (click)="corregirDocumento()"
+    [disabled]="loading"
+  >
     {{ loading ? 'Procesando…' : 'Corregir documento' }}
   </button>
+
+  <button
+    type="button"
+    (click)="descargarDocumentoCorregido()"
+    [disabled]="!resultadoCorreccion"
+  >
+    Descargar documento corregido
+  </button>
 </div>
 
-<!-- Resultados -->
-<section *ngIf="resultadoCorreccion" class="results">
-  <h3>Correcciones</h3>
-  <pre>{{ resultadoCorreccion | json }}</pre>
-</section>
-
-<!-- Visor del documento -->
+<!-- VISOR DEL DOCUMENTO -->
 <div class="viewer-container">
   <div class="header">
     <h1>Visualiza tu documento</h1>
@@ -40,9 +47,4 @@
   <ng-template #emptyState>
     <p class="muted">Aún no hay contenido cargado.</p>
   </ng-template>
-
-  <button (click)="descargarDocumentoCorregido()">
-  Descargar documento corregido
-</button>
-
 </div>
