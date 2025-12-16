@@ -34,10 +34,15 @@
   </div>
 
   <div class="document-box" *ngIf="documentContent; else emptyState">
-    <pre>{{ documentContent }}</pre>
+    <pre [innerHTML]="documentContentHTML"></pre>
   </div>
 
   <ng-template #emptyState>
     <p class="muted">Aún no hay contenido cargado.</p>
   </ng-template>
+
+  <button (click)="descargarDocumentoCorregido()">
+  Descargar documento corregido
+</button>
+
 </div>
