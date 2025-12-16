@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class CorrectorService {
 
-  private apiUrl = 'http://localhost:8000/ia/corregir'; // Ajusta tu URL
+  private apiUrl = 'http://localhost:8000'; // Ajusta tu URL
 
   constructor(private http: HttpClient) {}
 
