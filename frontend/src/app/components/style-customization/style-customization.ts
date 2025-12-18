@@ -38,16 +38,19 @@ constructor(
 ) {}
 
 
-  ngOnInit(): void {
-    const content = localStorage.getItem('uploadedDocument');
+ngOnInit(): void {
+  const content = localStorage.getItem('uploadedDocument');
 
-    this.documentContent = content
-      ? content
-      : 'No se encontró ningún documento cargado.';
+  this.documentContent = content
+    ? content
+    : 'No se encontró ningún documento cargado.';
 
-    this.documentContentHTML = this.documentContent;
-    this.errorPercent = 0;
-  }
+  this.documentContentHTML = this.documentContent;
+
+  // 🔥 AQUÍ ESTABA EL PROBLEMA
+  this.calcularPorcentaje();
+}
+
 
   // 🚀 Ejecutar corrección con IA
   corregirDocumento(): void {
@@ -120,18 +123,33 @@ marcarErrores(): void {
 }
 
 
-  calcularPorcentaje(): void {
-    const errores = this.resultadoCorreccion?.errores?.length || 0;
+calcularPorcentaje(): void {
+  const texto = this.documentContent?.trim() || '';
 
-    const palabras = this.documentContent
-      .trim()
-      .split(/\s+/)
-      .filter(p => p.length > 0).length;
-
-    this.errorPercent = palabras
-      ? Math.min(100, Math.round((errores / palabras) * 100))
-      : 0;
+  if (!texto) {
+    this.errorPercent = 0;
+    return;
   }
+
+  const palabras = texto.split(/\s+/).length;
+
+  // 👉 SI NO hay corrección aún
+  if (!this.resultadoCorreccion?.errores) {
+    // porcentaje base SOLO por tamaño del texto
+    this.errorPercent = Math.min(100, Math.round(palabras * 0.5));
+    return;
+  }
+
+  // 👉 CUANDO ya hay corrección
+  const errores = this.resultadoCorreccion.errores.length;
+
+  this.errorPercent = Math.min(
+    100,
+    Math.round((errores / palabras) * 100)
+  );
+}
+
+
 
 descargarDocumentoCorregido(): void {
   if (!this.resultadoCorreccion?.corregido) return;
