@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { CorrectorService } from '../../services/corrector';
 import { finalize, timeout } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Document, Packer, Paragraph } from 'docx';
+import { saveAs } from 'file-saver';
 
 
 @Component({
@@ -16,19 +18,17 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 })
 export class StyleCustomization implements OnInit {
 
-  // 📄 Texto original
+
   documentContent: string = '';
 
   // 🖍 Texto con errores resaltados (HTML)
   documentContentHTML: SafeHtml = '';
 
-  // 🤖 Respuesta de la IA
+
   resultadoCorreccion: any = null;
 
-  // ⏳ Estado de carga
   loading = false;
 
-  // 📊 Porcentaje de errores
   errorPercent = 0;
 
 constructor(
@@ -63,13 +63,12 @@ constructor(
         timeout(60000), // ⏱ máximo 60s
         finalize(() => {
           this.loading = false;
-          this.cdr.detectChanges(); // 🔥 fuerza render
+          this.cdr.detectChanges(); 
         })
       )
       .subscribe({
         next: (res: any) => {
 
-          // 🔐 Normalizar respuesta
           if (typeof res === 'string') {
             try {
               res = JSON.parse(res);
@@ -84,7 +83,7 @@ constructor(
           this.marcarErrores();
           this.calcularPorcentaje();
 
-          this.cdr.detectChanges(); // 🔥 render inmediato
+          this.cdr.detectChanges(); 
         },
         error: (err) => {
           console.error('Error en la corrección:', err);
@@ -135,20 +134,22 @@ marcarErrores(): void {
   }
 
   // 📥 Descargar documento corregido
-  descargarDocumentoCorregido(): void {
-    if (!this.resultadoCorreccion?.corregido) return;
+descargarDocumentoCorregido(): void {
+  if (!this.resultadoCorreccion?.corregido) return;
 
-    const blob = new Blob(
-      [this.resultadoCorreccion.corregido],
-      { type: 'text/plain;charset=utf-8' }
-    );
+  const doc = new Document({
+    sections: [
+      {
+        children: this.resultadoCorreccion.corregido
+          .split('\n')
+          .map((line: string) => new Paragraph(line)),
+      },
+    ],
+  });
 
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'documento-corregido.txt';
-    a.click();
+  Packer.toBlob(doc).then(blob => {
+    saveAs(blob, 'documento-corregido.docx');
+  });
+}
 
-    URL.revokeObjectURL(url);
-  }
 }
