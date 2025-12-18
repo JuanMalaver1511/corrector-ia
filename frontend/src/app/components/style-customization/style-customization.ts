@@ -133,7 +133,6 @@ marcarErrores(): void {
       : 0;
   }
 
-  // 📥 Descargar documento corregido
 descargarDocumentoCorregido(): void {
   if (!this.resultadoCorreccion?.corregido) return;
 
