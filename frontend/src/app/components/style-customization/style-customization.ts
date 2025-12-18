@@ -47,7 +47,6 @@ ngOnInit(): void {
 
   this.documentContentHTML = this.documentContent;
 
-  // 🔥 AQUÍ ESTABA EL PROBLEMA
   this.calcularPorcentaje();
 }
 
