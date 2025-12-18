@@ -132,14 +132,11 @@ calcularPorcentaje(): void {
 
   const palabras = texto.split(/\s+/).length;
 
-  // 👉 SI NO hay corrección aún
   if (!this.resultadoCorreccion?.errores) {
-    // porcentaje base SOLO por tamaño del texto
     this.errorPercent = Math.min(100, Math.round(palabras * 0.5));
     return;
   }
 
-  // 👉 CUANDO ya hay corrección
   const errores = this.resultadoCorreccion.errores.length;
 
   this.errorPercent = Math.min(
