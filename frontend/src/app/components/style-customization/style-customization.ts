@@ -21,7 +21,6 @@ export class StyleCustomization implements OnInit {
 
   documentContent: string = '';
 
-  // 🖍 Texto con errores resaltados (HTML)
   documentContentHTML: SafeHtml = '';
 
 
