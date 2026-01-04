@@ -1,0 +1,16 @@
+.contenedor {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.contenedor h2 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.contenedor p {
+  font-size: 16px;
+  margin-top: 5px;
+  color: #6b7280;
+}
