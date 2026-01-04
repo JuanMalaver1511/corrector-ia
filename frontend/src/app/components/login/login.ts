@@ -20,7 +20,6 @@ login(usuario: string, password: string) {
     this.errorMessage = '';
     console.log('Inicio de sesión correcto');
 
-    // 🔐 SIMULAR SESIÓN
     localStorage.setItem('token', 'fake-token-123');
     localStorage.setItem('usuario', JSON.stringify({ usuario }));
 
