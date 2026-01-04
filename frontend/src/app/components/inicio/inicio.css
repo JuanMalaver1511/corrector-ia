@@ -18,8 +18,8 @@
 
 /* Hero Section */
 .hero {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: var(--white);
+  background: #ffff;
+  color: var(--primary-color);
   padding: 120px 0;
   text-align: center;
 }
@@ -114,8 +114,8 @@
 /* Stats Section */
 .stats {
   padding: 80px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: var(--white);
+  background: #ffff;
+  color: var(--primary-color);
 }
 
 .stats-grid {
@@ -164,7 +164,7 @@
 }
 
 .cta-button-secondary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2f41a3;
   color: var(--white);
   border: none;
   padding: 16px 48px;
@@ -173,7 +173,6 @@
   border-radius: 50px;
   cursor: pointer;
   transition: var(--transition);
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
 }
 
 .cta-button-secondary:hover {
