@@ -1,16 +1,104 @@
-.contenedor {
+.page-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.hero-section {
   text-align: center;
-  margin-top: 50px;
+  margin-bottom: 50px;
 }
 
-.contenedor h2 {
+.hero-title {
   font-size: 32px;
-  font-weight: 700;
-  color: #1f2937;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
 }
 
-.contenedor p {
+.hero-description {
   font-size: 16px;
-  margin-top: 5px;
-  color: #6b7280;
+  color: #666;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.generator-section {
+  margin-bottom: 30px;
+}
+
+.input-label {
+  display: block;
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 12px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.input-textarea {
+  width: 100%;
+  padding: 14px;
+  font-size: 15px;
+  border: 2px solid #a1a1a1;
+  border-radius: 15px;
+  resize: vertical;
+  font-family: inherit;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+}
+
+.input-textarea:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
+.input-textarea::placeholder {
+  color: #999;
+}
+
+.btn-generate {
+  width: 100%;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  color: white;
+  background-color: #1e2d7a;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-generate:hover {
+  background-color: #1a2a8c;
+  box-shadow: 0 4px 12px rgba(38, 59, 179, 0.3);
+}
+
+.btn-generate:active {
+  transform: scale(0.98);
+}
+
+.download-section {
+  text-align: center;
+}
+
+.btn-download {
+  padding: 12px 32px;
+  font-size: 15px;
+  color: #4a90e2;
+  background-color: white;
+  border: 1px solid #0177ff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-download:hover {
+  background-color: #dae6f9;
+}
+
+.btn-download:active {
+  transform: scale(0.98);
 }
