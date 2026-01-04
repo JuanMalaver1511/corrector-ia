@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { Login } from './components/login/login';
+import { Inicio } from './components/inicio/inicio';
 import { Dashboard } from './components/dashboard/dashboard';
 import { StyleEditor } from './components/style-editor/style-editor';
 import { Component } from '@angular/compiler';
@@ -15,6 +16,11 @@ export const routes: Routes = [
   {
     path: 'login',
     component: Login
+  },
+  {
+    path: 'inicio',
+    component: Inicio,
+    canActivate: [AuthGuard]
   },
   {
     path: 'dashboard',

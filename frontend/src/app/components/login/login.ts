@@ -24,7 +24,7 @@ login(usuario: string, password: string) {
     localStorage.setItem('usuario', JSON.stringify({ usuario }));
 
 
-    this.router.navigate(['/dashboard'], { replaceUrl: true });
+    this.router.navigate(['/inicio'], { replaceUrl: true });
 
   } else {
     this.errorMessage = 'Usuario o contraseña incorrectos';
