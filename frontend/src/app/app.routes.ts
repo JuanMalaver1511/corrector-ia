@@ -5,6 +5,7 @@ import { Dashboard } from './components/dashboard/dashboard';
 import { StyleEditor } from './components/style-editor/style-editor';
 import { Component } from '@angular/compiler';
 import { StyleCustomization } from './components/style-customization/style-customization';
+import { Questionnaires } from './components/questionnaires/questionnaires';
 import { AuthGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
@@ -35,6 +36,11 @@ export const routes: Routes = [
   {
   path: 'style-customization',
   component: StyleCustomization
+  },
+  {
+    path: 'questionnaires',
+    component: Questionnaires,
+    canActivate: [AuthGuard]
   },
     {
     path: '**',
