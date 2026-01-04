@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Navbar } from '../navbar/navbar';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -9,7 +10,15 @@ import { Navbar } from '../navbar/navbar';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
-export class Dashboard {
+export class Dashboard implements OnInit {
 
-  constructor() {}
+  constructor(private router: Router) {}
+
+  ngOnInit(): void {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      this.router.navigate(['/login'], { replaceUrl: true });
+    }
+  }
 }
