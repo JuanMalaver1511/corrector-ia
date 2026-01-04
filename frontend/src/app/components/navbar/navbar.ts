@@ -16,18 +16,9 @@ export class Navbar {
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }
+logout() {
+  localStorage.clear();
 
-  logout() {
-    // Eliminar datos de sesión
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
-
-    // Opcional: borrar todo
-    localStorage.clear();
-
-    console.log('Sesión cerrada');
-
-    // Redirigir al login
-    this.router.navigate(['/login']);
-  }
+  this.router.navigate(['/login'], { replaceUrl: true });
+}
 }
