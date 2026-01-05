@@ -9,21 +9,21 @@
     </div>
 
     <div class="generator-section">
-        <textarea 
-            class="input-textarea" 
-            placeholder="Ejemplo: 10 preguntas de opción múltiple sobre la fotosíntesis"
-            rows="5" 
-            [(ngModel)]="prompt"
-            [disabled]="isLoading">
+        <textarea class="input-textarea" placeholder="Ejemplo: 10 preguntas de opción múltiple sobre la fotosíntesis"
+            rows="5" [(ngModel)]="prompt" [disabled]="isLoading">
         </textarea>
 
-        <button 
-            class="btn-generate" 
-            [disabled]="isLoading || !prompt.trim()" 
-            (click)="analizeQuestionnaire()">
+        <button class="btn-generate" [disabled]="isLoading || !prompt.trim()" (click)="analizeQuestionnaire()">
             {{ isLoading ? 'Generando...' : 'Generar cuestionario' }}
         </button>
-        
+
+        <!-- Botón de descarga -->
+        <div class="download-section" *ngIf="!isLoading && result && result.length > 0">
+            <button class="btn-download" (click)="download()">
+                Descargar cuestionario
+            </button>
+        </div>
+
         <!-- Loading -->
         <div *ngIf="isLoading">
             <app-loading></app-loading>
@@ -34,13 +34,6 @@
         <div *ngIf="!isLoading && result && result.length > 0" class="result-section">
             <h3>Cuestionario generado:</h3>
             <pre>{{ result }}</pre>
-        </div>
-
-        <!-- Botón de descarga -->
-        <div class="download-section" *ngIf="!isLoading && result && result.length > 0">
-            <button class="btn-download" (click)="download()">
-                Descargar cuestionario
-            </button>
         </div>
     </div>
 </div>
