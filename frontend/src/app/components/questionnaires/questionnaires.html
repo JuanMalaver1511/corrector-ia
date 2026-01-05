@@ -16,18 +16,21 @@
             rows="5" [(ngModel)]="prompt">
 </textarea>
 
-        <button class="btn-generate" (click)="analizeQuestionnaire()">
-            Generar cuestionario
+        <button class="btn-generate" [disabled]="isLoading" (click)="analizeQuestionnaire()">
+
+            {{ isLoading ? 'Generando...' : 'Generar cuestionario' }}
         </button>
+        
+        <app-loading *ngIf="isLoading"></app-loading>
+
+        <div *ngIf="!isLoading && result" class="result-section">
+            <pre>{{ result }}</pre>
+        </div>
+
 
         <div class="download-section" *ngIf="result">
             <button class="btn-download" (click)="download()">
                 Descargar cuestionario
             </button>
         </div>
-
-        <div *ngIf="result" class="result-section">
-            <pre>{{ result }}</pre>
-        </div>
-
     </div>

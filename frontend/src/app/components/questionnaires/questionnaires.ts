@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Navbar } from "../navbar/navbar";
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { Loading } from '../loading/loading';
 
 @Component({
   selector: 'app-questionnaires',
@@ -10,7 +11,8 @@ import { FormsModule } from '@angular/forms';
   imports: [
     CommonModule,   // 👈 NECESARIO para *ngIf, *ngFor, etc
     FormsModule,    // 👈 NECESARIO para ngModel
-    Navbar
+    Navbar,
+    Loading
   ],
   templateUrl: './questionnaires.html',
   styleUrl: './questionnaires.css',
@@ -24,9 +26,15 @@ export class Questionnaires {
 
   constructor(private http: HttpClient) {}
 
+    isLoading = false;
 
 analizeQuestionnaire(): void {
   console.log('Prompt enviado:', this.prompt);
+
+  if (this.isLoading) return; 
+
+  this.isLoading = true;
+  this.result = ''; // limpia resultado previo
 
   const payload = {
     tema: this.prompt,
@@ -34,19 +42,20 @@ analizeQuestionnaire(): void {
     cantidad: 10
   };
 
-  console.log('Payload:', payload);
-
   this.http.post<any>(`${this.apiUrl}/ia/questionnaire`, payload)
     .subscribe({
       next: (res) => {
         console.log('Respuesta backend:', res);
         this.result = res.cuestionario;
+        this.isLoading = false;
       },
       error: (err) => {
         console.error('Error backend:', err);
+        this.isLoading = false;
       }
     });
 }
+
 
 
   download(): void {
