@@ -1,3 +1,28 @@
+
+.page-container {
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+.generator-section {
+  height: auto;
+  overflow: visible;
+}
+
+.result-section {
+  margin-top: 2rem;
+  background: rgba(3, 42, 82, 0.7);
+  color: #ffffff;
+  padding: 1rem;
+  border-radius: 12px;
+  max-height: none;
+}
+
+pre {
+  white-space: pre-wrap; 
+  word-wrap: break-word;
+}
+
 .page-container {
   max-width: 700px;
   margin: 0 auto;
@@ -70,6 +95,7 @@
   border-radius: 10px;
   cursor: pointer;
   transition: background-color 0.2s;
+  margin-bottom: 10px;
 }
 
 .btn-generate:hover {

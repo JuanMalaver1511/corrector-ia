@@ -20,13 +20,14 @@
             Generar cuestionario
         </button>
 
-        <div *ngIf="result" class="result-section">
-            <pre>{{ result }}</pre>
-        </div>
-
         <div class="download-section" *ngIf="result">
             <button class="btn-download" (click)="download()">
                 Descargar cuestionario
             </button>
         </div>
+
+        <div *ngIf="result" class="result-section">
+            <pre>{{ result }}</pre>
+        </div>
+
     </div>

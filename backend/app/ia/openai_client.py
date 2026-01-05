@@ -33,10 +33,13 @@ def generar_cuestionario(tema, tipo, cantidad):
 
     Tipo de preguntas: {tipo}.
 
+    no pongas astericos.
     Reglas:
     - Cada pregunta debe tener 4 opciones (A, B, C, D)
     - Marca la respuesta correcta al final de cada pregunta
     - No incluyas explicaciones adicionales
+    
+    Importante: no incluyas asteriscos, cuando marques la respuesta correcta, pon entre paréntesis la letra de la respuesta correcta.
     """
 
     completion = client.chat.completions.create(

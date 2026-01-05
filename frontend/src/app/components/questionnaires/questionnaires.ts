@@ -24,19 +24,30 @@ export class Questionnaires {
 
   constructor(private http: HttpClient) {}
 
-  analizeQuestionnaire(): void {
-    const payload = {
-      tema: this.prompt,
-      tipo: 'opción múltiple',
-      cantidad: 10
-    };
 
-    this.http.post<any>(`${this.apiUrl}/ia/questionnaire`, payload)
-      .subscribe({
-        next: (res) => this.result = res.cuestionario,
-        error: (err) => console.error(err)
-      });
-  }
+analizeQuestionnaire(): void {
+  console.log('Prompt enviado:', this.prompt);
+
+  const payload = {
+    tema: this.prompt,
+    tipo: 'opción múltiple',
+    cantidad: 10
+  };
+
+  console.log('Payload:', payload);
+
+  this.http.post<any>(`${this.apiUrl}/ia/questionnaire`, payload)
+    .subscribe({
+      next: (res) => {
+        console.log('Respuesta backend:', res);
+        this.result = res.cuestionario;
+      },
+      error: (err) => {
+        console.error('Error backend:', err);
+      }
+    });
+}
+
 
   download(): void {
     const blob = new Blob([this.result], { type: 'text/plain;charset=utf-8' });
