@@ -81,10 +81,11 @@ ngOnInit(): void {
 
           this.resultadoCorreccion = res;
 
+           
           this.marcarErrores();
+          this.cdr.detectChanges();
           this.calcularPorcentaje();
 
-          this.cdr.detectChanges(); 
         },
         error: (err) => {
           console.error('Error en la corrección:', err);

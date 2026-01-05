@@ -20,4 +20,4 @@ app.include_router(ia.router)
 
 @app.get("/")
 def root():
-    return {"message": "Backend IA funcionandoo 🚀"}
+    return {"message": "Backend IA funcionandoo"}
