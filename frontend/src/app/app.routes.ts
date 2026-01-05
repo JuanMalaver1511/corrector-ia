@@ -6,6 +6,7 @@ import { StyleEditor } from './components/style-editor/style-editor';
 import { Component } from '@angular/compiler';
 import { StyleCustomization } from './components/style-customization/style-customization';
 import { Questionnaires } from './components/questionnaires/questionnaires';
+import { Paraphraser } from './components/paraphraser/paraphraser';
 import { AuthGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
@@ -42,6 +43,12 @@ export const routes: Routes = [
     component: Questionnaires,
     canActivate: [AuthGuard]
   },
+  {
+    path: 'paraphraser',
+    component: Paraphraser,
+    canActivate: [AuthGuard]
+  },
+
     {
     path: '**',
     redirectTo: 'login'

@@ -29,17 +29,17 @@ def corregir_chunk(texto):
 
 def generar_cuestionario(tema, tipo, cantidad):
     prompt = f"""
+    Importante: no incluyas asteriscos en ninguna parte del texto, cuando marques la respuesta correcta pon entre paréntesis la letra de la respuesta correcta.
     Genera un cuestionario de {cantidad} preguntas sobre el tema: "{tema}".
 
     Tipo de preguntas: {tipo}.
 
-    Importante: no pongas asteriscos.
     Reglas:
     - Cada pregunta debe tener 4 opciones (A, B, C, D)
-    - Marca la respuesta correcta al final de cada pregunta
+    - Marca la respuesta correcta al final de cada pregunta, ejemplo (Respuesta correcta: A)
     - No incluyas explicaciones adicionales
     
-    Importante: no incluyas asteriscos en ninguna parte del texto, cuando marques la respuesta correcta pon entre paréntesis la letra de la respuesta correcta.
+    
     """
 
     completion = client.chat.completions.create(

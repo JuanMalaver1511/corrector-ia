@@ -5,32 +5,33 @@
   <p>Sube tu documento y detectaremos errores de estilo automáticamente</p>
 </div>
 
-<div 
-  class="area-upload" 
-  [class.dragging]="isDragging"
-  (dragover)="onDragOver($event)"
-  (dragleave)="onDragLeave($event)"
-  (drop)="onDrop($event)"
->
-    <div class="icono">
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload-icon lucide-upload"><path d="M12 3v12"/><path d="m17 8-5-5-5 5"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
-    </div>
+<div class="area-upload" [class.dragging]="isDragging" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)">
+  <div class="icono">
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-upload-icon lucide-upload">
+      <path d="M12 3v12" />
+      <path d="m17 8-5-5-5 5" />
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    </svg>
+  </div>
 
-    <p>Arrastra tu archivo aquí</p>
-    <span>o</span>
+  <p>Arrastra tu archivo aquí</p>
+  <span>o</span>
 
-    <label class="btn-subir">
-      Seleccionar archivo
-      <input type="file" hidden (change)="onFileSelected($event)" accept=".pdf, .docx, application/pdf, application/vnd.openxmlformats-officedocument.wordprocessingml.document"/>
-    </label>
-    <span>
-      Soporta: .docx .pdf
-    </span>
+  <label class="btn-subir">
+    Seleccionar archivo
+    <input type="file" hidden (change)="onFileSelected($event)"
+      accept=".pdf, .docx, application/pdf, application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+  </label>
+  <span>
+    Soporta: .docx .pdf
+  </span>
 
-    <div *ngIf="selectedFile" class="file-info">
-Archivo seleccionado: <strong>{{ selectedFile?.name }}</strong>
-    </div>
+  <div *ngIf="selectedFile" class="file-info">
+    Archivo seleccionado: <strong>{{ selectedFile?.name }}</strong>
+  </div>
 
-<app-loading *ngIf="isLoading"></app-loading>
+  <app-loading *ngIf="isLoading"></app-loading>
 
 </div>
