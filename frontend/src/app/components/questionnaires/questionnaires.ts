@@ -40,7 +40,6 @@ export class Questionnaires {
       return;
     }
 
-    // Cambia el estado dentro de ngZone
     this.ngZone.run(() => {
       this.isLoading = true;
       this.result = '';
@@ -78,7 +77,7 @@ export class Questionnaires {
           });
         },
         error: (err) => {
-          console.error('❌ Error del backend:', err);
+          console.error('Error del backend:', err);
           
           this.ngZone.run(() => {
             this.isLoading = false;
@@ -87,7 +86,7 @@ export class Questionnaires {
           });
         },
         complete: () => {
-          console.log('🏁 Observable completado');
+          console.log('Observable completado');
         }
       });
   }
