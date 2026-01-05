@@ -27,18 +27,23 @@ def corregir_chunk(texto):
 
     return completion.choices[0].message.content
 
-def generar_cuestionario(texto):
+def generar_cuestionario(tema, tipo, cantidad):
+    prompt = f"""
+    Genera un cuestionario de {cantidad} preguntas sobre el tema: "{tema}".
+
+    Tipo de preguntas: {tipo}.
+
+    Reglas:
+    - Cada pregunta debe tener 4 opciones (A, B, C, D)
+    - Marca la respuesta correcta al final de cada pregunta
+    - No incluyas explicaciones adicionales
+    """
+
     completion = client.chat.completions.create(
         model="deepseek-chat",
         messages=[
-            {
-                "role": "system",
-                "content": "Genera un cuestionario de 10 preguntas de opción múltiple basadas en el siguiente texto. Cada pregunta debe tener 4 opciones (A, B, C, D) y la respuesta correcta debe estar marcada al final. Devuelve solo las preguntas y opciones."
-            },
-            {
-                "role": "user",
-                "content": texto
-            }
+            {"role": "system", "content": "Eres un generador de cuestionarios educativos."},
+            {"role": "user", "content": prompt}
         ],
         temperature=0.3
     )

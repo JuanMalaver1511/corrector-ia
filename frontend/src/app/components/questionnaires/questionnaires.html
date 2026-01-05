@@ -13,12 +13,20 @@
             Dime el tema, el tipo de pregunta y la cantidad de preguntas que quieres generar
         </label>
         <textarea class="input-textarea" placeholder="Ejemplo: 10 preguntas de opción múltiple sobre la fotosíntesis"
-            rows="5"></textarea>
+            rows="5" [(ngModel)]="prompt">
+</textarea>
 
-        <button class="btn-generate">Generar cuestionario</button>
-    </div>
+        <button class="btn-generate" (click)="analizeQuestionnaire()">
+            Generar cuestionario
+        </button>
 
-    <div class="download-section">
-        <button class="btn-download">Descargar cuestionario</button>
+        <div *ngIf="result" class="result-section">
+            <pre>{{ result }}</pre>
+        </div>
+
+        <div class="download-section" *ngIf="result">
+            <button class="btn-download" (click)="download()">
+                Descargar cuestionario
+            </button>
+        </div>
     </div>
-</div>
