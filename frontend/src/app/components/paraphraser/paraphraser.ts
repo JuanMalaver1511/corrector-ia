@@ -4,6 +4,9 @@ import { CommonModule } from '@angular/common';
 import { Loading } from '../loading/loading';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { NgZone } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
+import { finalize } from 'rxjs/operators';
 
 import * as mammoth from "mammoth";
 import * as pdfjsLib from "pdfjs-dist";
@@ -16,42 +19,56 @@ import * as pdfjsLib from "pdfjs-dist";
 })
 export class Paraphraser {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private zone: NgZone, private cdRef: ChangeDetectorRef) { }
 
   paraphrasedText: string = '';
   originalText: string = '';
   isDragging = false;
   selectedFile: File | null = null;
   isLoading = false;
+  isParaphraseOk = false;
 
   // ---------------------------
   // PARAFRASEAR IA
   // ---------------------------
-  parafrasear() {
-    console.log('🧠 Click en parafrasear');
+parafrasear() {
 
-    if (!this.paraphrasedText.trim()) {
-      console.warn('⚠️ Texto vacío, no se envía a la IA');
-      return;
-    }
+  console.log('🧠 Click en parafrasear');
 
-    this.isLoading = true;
-    console.log('📡 Enviando texto a IA...');
-
-    this.http.post<any>('http://localhost:8000/ia/paraphrase', {
-      texto: this.paraphrasedText
-    }).subscribe({
-      next: (res) => {
-        console.log('✅ Respuesta IA:', res);
-        this.paraphrasedText = res.resultado;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('❌ Error IA:', err);
-        this.isLoading = false;
-      }
-    });
+  if (!this.paraphrasedText.trim()) {
+    console.warn('⚠️ Texto vacío, no se envía a la IA');
+    return;
   }
+
+  this.isLoading = true;
+  this.isParaphraseOk = false;
+  console.log('📡 Enviando texto a IA...');
+
+  this.http.post<any>('http://localhost:8000/ia/paraphrase', {
+    texto: this.paraphrasedText
+  })
+  .pipe(
+    finalize(() => {
+      this.zone.run(() => {
+        this.isLoading = false;
+        this.cdRef.detectChanges(); // 👈 aquí sí
+      });
+    })
+  )
+  .subscribe({
+    next: (res) => {
+      console.log('✅ Respuesta IA:', res);
+      this.zone.run(() => {
+        this.paraphrasedText = res.resultado;
+        this.isParaphraseOk = true;
+        this.cdRef.detectChanges();
+      });
+    },
+    error: (err) => {
+      console.error('❌ Error IA:', err);
+    }
+  });
+}
 
   // ---------------------------
   // DRAG & DROP
@@ -95,7 +112,7 @@ export class Paraphraser {
   // ---------------------------
   // PROCESAR ARCHIVO
   // ---------------------------
-  processFile(file: File) {
+  async processFile(file: File) {
     this.isLoading = true;
     console.log('⚙️ Procesando archivo...');
     console.log('📌 Tipo:', file.type);
@@ -104,113 +121,132 @@ export class Paraphraser {
     const type = file.type.toLowerCase();
     const name = file.name.toLowerCase();
 
-    if (type.includes("pdf")) {
-      console.log('📕 Detectado PDF');
-      this.extractPdfText(file);
-    } else if (name.endsWith(".docx") || type.includes("word")) {
-      console.log('📘 Detectado DOCX');
-      this.extractWordText(file);
-    } else {
-      console.log('📄 Detectado TXT');
-      this.extractTextFile(file);
-    }
+    try {
+      if (type.includes("pdf")) {
+        console.log('📕 Detectado PDF');
+        await this.extractPdfText(file);
+      } else if (name.endsWith(".docx") || type.includes("word")) {
+        console.log('📘 Detectado DOCX');
+        await this.extractWordText(file);
+      } else {
+        console.log('📄 Detectado TXT');
+        await this.extractTextFile(file);
+      }
+    } catch (error) {
+      console.error('❌ Error procesando archivo:', error);
+    } finally {
+  this.zone.run(() => {
+    this.isLoading = false;
+    this.cdRef.detectChanges();
+    console.log('✅ Proceso completado, loading desactivado');
+  });
+}
+
   }
 
   // ---------------------------
   // TXT
   // ---------------------------
-  extractTextFile(file: File) {
+  extractTextFile(file: File): Promise<void> {
     console.log('📄 Leyendo TXT...');
-    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
 
-    reader.onload = () => {
-      console.log('✅ TXT leído');
-      this.originalText = reader.result as string;
-      this.paraphrasedText = this.originalText;
-      this.isLoading = false;
-    };
+      reader.onload = () => {
+        console.log('✅ TXT leído');
+        this.zone.run(() => {
+          this.originalText = reader.result as string;
+          this.paraphrasedText = this.originalText;
+          resolve();
+        });
+      };
 
-    reader.onerror = (e) => {
-      console.error('❌ Error leyendo TXT', e);
-      this.isLoading = false;
-    };
+      reader.onerror = (e) => {
+        console.error('❌ Error leyendo TXT', e);
+        reject(e);
+      };
 
-    reader.readAsText(file);
+      reader.readAsText(file);
+    });
   }
 
   // ---------------------------
   // DOCX
   // ---------------------------
-  extractWordText(file: File) {
+  extractWordText(file: File): Promise<void> {
     console.log('📘 Leyendo DOCX...');
-    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
 
-    reader.onload = async () => {
-      try {
-        const arrayBuffer = reader.result as ArrayBuffer;
-        const result = await mammoth.extractRawText({ arrayBuffer });
+      reader.onload = async () => {
+        try {
+          const arrayBuffer = reader.result as ArrayBuffer;
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          this.zone.run(() => {
+            console.log('✅ DOCX leído');
+            this.originalText = result.value;
+            this.paraphrasedText = result.value;
+            resolve();
+          });
+        } catch (e) {
+          console.error('❌ Error DOCX', e);
+          reject(e);
+        }
+      };
 
-        console.log('✅ DOCX leído');
-        this.originalText = result.value;
-        this.paraphrasedText = result.value;
-      } catch (e) {
-        console.error('❌ Error DOCX', e);
-      } finally {
-        this.isLoading = false;
-      }
-    };
+      reader.onerror = (e) => {
+        console.error('❌ Error FileReader DOCX', e);
+        reject(e);
+      };
 
-    reader.onerror = (e) => {
-      console.error('❌ Error FileReader DOCX', e);
-      this.isLoading = false;
-    };
-
-    reader.readAsArrayBuffer(file);
+      reader.readAsArrayBuffer(file);
+    });
   }
 
   // ---------------------------
   // PDF
   // ---------------------------
-  async extractPdfText(file: File) {
+  extractPdfText(file: File): Promise<void> {
     console.log('📕 Leyendo PDF...');
-    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
 
-    reader.onload = async () => {
-      try {
-        console.log('📕 FileReader PDF OK');
+      reader.onload = async () => {
+        try {
+          console.log('📕 FileReader PDF OK');
 
-        const typedArray = new Uint8Array(reader.result as ArrayBuffer);
-        console.log('📕 Uint8Array creado');
+          const typedArray = new Uint8Array(reader.result as ArrayBuffer);
+          console.log('📕 Uint8Array creado');
 
-        const pdf: any = await pdfjsLib.getDocument(typedArray).promise;
-        console.log('📕 PDF cargado, páginas:', pdf.numPages);
+          const pdf: any = await pdfjsLib.getDocument(typedArray).promise;
+          console.log('📕 PDF cargado, páginas:', pdf.numPages);
 
-        let finalText = '';
+          let finalText = '';
 
-        for (let i = 1; i <= pdf.numPages; i++) {
-          console.log(`📄 Leyendo página ${i}`);
-          const page = await pdf.getPage(i);
-          const textContent = await page.getTextContent();
-          const strings = textContent.items.map((item: any) => item.str);
-          finalText += strings.join(' ') + '\n\n';
+          for (let i = 1; i <= pdf.numPages; i++) {
+            console.log(`📄 Leyendo página ${i}`);
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const strings = textContent.items.map((item: any) => item.str);
+            finalText += strings.join(' ') + '\n\n';
+          }
+
+          console.log('✅ PDF leído completo');
+          this.originalText = finalText;
+          this.paraphrasedText = finalText;
+          resolve();
+        } catch (e) {
+          console.error('❌ Error PDF', e);
+          reject(e);
         }
+      };
 
-        console.log('✅ PDF leído completo');
-        this.originalText = finalText;
-        this.paraphrasedText = finalText;
+      reader.onerror = (e) => {
+        console.error('❌ Error FileReader PDF', e);
+        reject(e);
+      };
 
-      } catch (e) {
-        console.error('❌ Error PDF', e);
-      } finally {
-        this.isLoading = false;
-      }
-    };
-
-    reader.onerror = (e) => {
-      console.error('❌ Error FileReader PDF', e);
-      this.isLoading = false;
-    };
-
-    reader.readAsArrayBuffer(file);
+      reader.readAsArrayBuffer(file);
+    });
   }
 }

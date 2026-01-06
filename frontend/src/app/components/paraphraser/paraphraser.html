@@ -39,7 +39,6 @@
 
 </div>
 <div class="resultado" *ngIf="originalText">
-
     <div class="bloques-texto">
 
         <div class="bloque">
@@ -49,7 +48,7 @@
 
         <div class="bloque">
             <h3>Texto parafraseado</h3>
-            <textarea rows="10" [(ngModel)]="paraphrasedText">
+            <textarea rows="10" [(ngModel)]="paraphrasedText" [ngClass]="{'texto-correcto': isParaphraseOk}">
       </textarea>
         </div>
 
