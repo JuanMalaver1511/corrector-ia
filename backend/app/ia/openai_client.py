@@ -52,3 +52,21 @@ def generar_cuestionario(tema, tipo, cantidad):
     )
 
     return completion.choices[0].message.content
+
+def parafrasear_texto(texto):
+    completion = client.chat.completions.create(
+        model="deepseek-chat",
+        messages=[
+            {
+                "role": "system",
+                "content": "Parafrasea el texto proporcionado manteniendo el mismo significado pero utilizando diferentes palabras y estructuras. Devuelve solo el texto parafraseado."
+            },
+            {
+                "role": "user",
+                "content": texto
+            }
+        ],
+        temperature=0.7
+    )
+
+    return completion.choices[0].message.content
