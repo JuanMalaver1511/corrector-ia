@@ -38,7 +38,11 @@
     <app-loading *ngIf="isLoading"></app-loading>
 
 </div>
+
 <div class="resultado" *ngIf="originalText">
+        <button class="btn-primary" (click)="parafrasear()">
+        Parafrasear con IA
+    </button>
     <div class="bloques-texto">
 
         <div class="bloque">
@@ -53,9 +57,4 @@
         </div>
 
     </div>
-
-    <button class="btn-primary" (click)="parafrasear()">
-        Parafrasear con IA
-    </button>
-
 </div>
