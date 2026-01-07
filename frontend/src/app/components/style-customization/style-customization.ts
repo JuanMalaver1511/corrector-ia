@@ -94,6 +94,13 @@ ngOnInit(): void {
   }
 
 marcarErrores(): void {
+  if (!this.documentContent) {
+    console.warn('documentContent vacío');
+    return;
+  }else{
+    console.log('documentContent:', this.documentContent);
+  }
+
   let texto = this.documentContent;
 
   if (!this.resultadoCorreccion?.errores?.length) {
@@ -106,13 +113,13 @@ marcarErrores(): void {
     if (!err.original) return;
 
     const palabra = err.original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`\\b${palabra}\\b`, 'gi');
+    const regex = new RegExp(`(${palabra})`, 'gi');
 
     texto = texto.replace(
       regex,
       `<span class="error"
         title="Corrección: ${err.correccion || ''} ${err.motivo || ''}">
-        ${err.original}
+        $1
       </span>`
     );
   });
@@ -120,6 +127,7 @@ marcarErrores(): void {
   this.documentContentHTML =
     this.sanitizer.bypassSecurityTrustHtml(texto);
 }
+
 
 
 calcularPorcentaje(): void {

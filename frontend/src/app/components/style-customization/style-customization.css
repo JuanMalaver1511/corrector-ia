@@ -40,8 +40,7 @@
 
 /* ==== ERRORES MARCADOS ==== */
 .error {
-  background: #f87171;
-  color: white;
+  color: red !important;
   padding: 2px 4px;
   border-radius: 4px;
   font-weight: 600;
@@ -97,6 +96,8 @@
   gap: 16px;
   margin: 25px 0;
 }
+
+
 
 /* ==== BOTÓN PRINCIPAL (CORREGIR) ==== */
 .actions button:first-child {
