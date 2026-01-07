@@ -40,15 +40,16 @@
 </div>
 
 <div class="resultado" *ngIf="originalText">
-        <button class="btn-primary" (click)="parafrasear()">
-        Parafrasear con IA
-    </button>
+
     <div class="bloques-texto">
 
         <div class="bloque">
             <h3>Texto original</h3>
             <textarea rows="10" [value]="originalText" disabled></textarea>
         </div>
+        <button class="btn-primary" (click)="parafrasear()">
+            Parafrasear con IA
+        </button>
 
         <div class="bloque">
             <h3>Texto parafraseado</h3>
