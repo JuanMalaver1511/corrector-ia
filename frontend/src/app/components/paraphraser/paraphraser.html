@@ -48,11 +48,21 @@
             Parafrasear con IA
         </button>
 
-        <div class="bloque">
-            <h3>Texto parafraseado</h3>
-            <textarea rows="10" [(ngModel)]="paraphrasedText" [ngClass]="{'texto-correcto': isParaphraseOk}">
-      </textarea>
-        </div>
+<div class="bloque">
+  <h3>Texto parafraseado</h3>
+
+  <textarea
+    rows="10"
+    [(ngModel)]="paraphrasedText"
+    [ngClass]="{ 'texto-correcto': isParaphraseOk }"
+    readonly
+  ></textarea>
+
+  <button class="btn-copiar" (click)="copiarTexto()">
+    📋 Copiar
+  </button>
+</div>
+
 
     </div>
 </div>

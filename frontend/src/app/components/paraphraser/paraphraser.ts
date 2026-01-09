@@ -249,4 +249,18 @@ parafrasear() {
       reader.readAsArrayBuffer(file);
     });
   }
+  copiarTexto(): void {
+  if (!this.paraphrasedText) {
+    return;
+  }
+
+  navigator.clipboard.writeText(this.paraphrasedText)
+    .then(() => {
+      console.log('Texto copiado al portapapeles');
+    })
+    .catch(err => {
+      console.error('Error al copiar', err);
+    });
+}
+
 }
