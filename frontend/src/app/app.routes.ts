@@ -7,6 +7,7 @@ import { Component } from '@angular/compiler';
 import { StyleCustomization } from './components/style-customization/style-customization';
 import { Questionnaires } from './components/questionnaires/questionnaires';
 import { Paraphraser } from './components/paraphraser/paraphraser';
+import { Profile } from './components/profile/profile';
 import { AuthGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
@@ -46,6 +47,11 @@ export const routes: Routes = [
   {
     path: 'paraphraser',
     component: Paraphraser,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'profile',
+    component: Profile,
     canActivate: [AuthGuard]
   },
 
