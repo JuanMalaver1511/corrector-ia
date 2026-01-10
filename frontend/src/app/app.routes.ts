@@ -8,6 +8,7 @@ import { StyleCustomization } from './components/style-customization/style-custo
 import { Questionnaires } from './components/questionnaires/questionnaires';
 import { Paraphraser } from './components/paraphraser/paraphraser';
 import { Profile } from './components/profile/profile';
+import { Settings } from './components/settings/settings';
 import { AuthGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
@@ -52,6 +53,11 @@ export const routes: Routes = [
   {
     path: 'profile',
     component: Profile,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'settings',
+    component: Settings,
     canActivate: [AuthGuard]
   },
 
