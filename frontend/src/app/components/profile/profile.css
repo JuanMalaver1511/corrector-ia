@@ -48,7 +48,6 @@
     0 4px 12px rgba(0, 0, 0, 0.08),
     0 2px 4px rgba(0, 0, 0, 0.06);
   transform: translateY(-2px);
-  border: 2px solid #065ee2;
 }
 
 .profile-avatar {
