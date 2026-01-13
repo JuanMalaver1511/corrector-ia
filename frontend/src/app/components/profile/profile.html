@@ -1,21 +1,77 @@
 <app-navbar></app-navbar>
 <div class="dashboard-container">
-  <header class="dashboard-header">
-    <h1>Mi perfil</h1>
-  </header>
+    <header class="dashboard-header">
+        <h1>Mi perfil</h1>
+    </header>
 
-<div class="card-profile">
-  <div class="profile-avatar">
-    <img src="user.png" alt="Foto de perfil">
-  </div>
-  
-  <div class="profile-info">
-    <h2 class="profile-name">Juan Pérez</h2>
-    <p class="profile-email">juanperez@gmail.com</p>
-    <p class="profile-title">Ingeniero de sistemas</p>
-    <p class="profile-location">Tunja - Boyacá</p>
-  </div>
-  
-  <button class="btn-edit">Editar perfil</button>
+    <div class="card-profile">
+        <div class="profile-avatar">
+            <img src="user.png" alt="Foto de perfil">
+        </div>
+
+        <div class="profile-info">
+            <h2 class="profile-name">Juan Pérez</h2>
+            <p class="profile-title">Ingeniero de sistemas</p>
+            <p class="profile-email">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-mail-icon lucide-mail">
+                    <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7" />
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                </svg>
+                juanperez@gmail.com
+            </p>
+
+            <p class="profile-location">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-map-pin-icon lucide-map-pin">
+                    <path
+                        d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
+                    <circle cx="12" cy="10" r="3" />
+                </svg>
+                Tunja - Boyacá
+            </p>
+        </div>
+
+        <button  (click)="openEditProfile()" class="btn-edit">Editar perfil</button>
+    </div>
+
+<!-- Editar perfil -->
+<div class="edit-profile" [class.active]="isEditProfileOpen" (click)="closeEditProfile()">
+    <div class="edit-profile-form" (click)="$event.stopPropagation()">
+        <h2>Editar perfil</h2>
+        <form (ngSubmit)="saveProfile()">
+            <div class="form-group">
+                <label for="name">Nombre</label>
+                <input 
+                    type="text" 
+                    id="name" 
+                    name="name" 
+                    [(ngModel)]="profileData.name"
+                    placeholder="Juan Perez">
+            </div>
+            <div class="form-group">
+                <label for="title">Título profesional</label>
+                <input 
+                    type="text" 
+                    id="title" 
+                    name="title" 
+                    [(ngModel)]="profileData.title"
+                    placeholder="Ingeniero de sistemas">
+            </div>
+            <div class="form-group">
+                <label for="location">Ubicación</label>
+                <input 
+                    type="text" 
+                    id="location" 
+                    name="location" 
+                    [(ngModel)]="profileData.location"
+                    placeholder="Tunja - Boyacá">
+            </div>
+            <button type="submit" class="btn-save">Guardar cambios</button>
+        </form>
+    </div>
 </div>
+
 </div>
