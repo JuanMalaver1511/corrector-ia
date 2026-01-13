@@ -233,7 +233,7 @@
 .btn-save {
   margin-top: 8px;
   padding: 14px 24px;
-  background: #3b82f6;
+  background: #1e2d7a;
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -245,7 +245,7 @@
 }
 
 .btn-save:hover {
-  background: #2563eb;
+  background: #36479b;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
