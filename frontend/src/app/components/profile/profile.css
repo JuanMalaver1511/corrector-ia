@@ -31,7 +31,7 @@
 }
 
 .card-profile {
-  background: #ebe9e9;
+  background: #f5f5f5;
   border-radius: 16px;
   padding: 1.5rem 2rem;
   box-shadow: 
@@ -40,6 +40,7 @@
   transition: all 0.3s ease;
   max-width: 380px;
   margin: 0 auto;
+  border-bottom: 1px solid #3b3b3b;
 }
 
 .card-profile:hover {
@@ -47,6 +48,7 @@
     0 4px 12px rgba(0, 0, 0, 0.08),
     0 2px 4px rgba(0, 0, 0, 0.06);
   transform: translateY(-2px);
+  border: 2px solid #065ee2;
 }
 
 .profile-avatar {
