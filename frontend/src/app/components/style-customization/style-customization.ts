@@ -3,11 +3,23 @@ import { Navbar } from '../navbar/navbar';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CorrectorService } from '../../services/corrector';
-import { finalize, timeout } from 'rxjs/operators';
+import { finalize } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Document, Packer, Paragraph } from 'docx';
+import { Document, Packer, Paragraph, TextRun } from 'docx';
 import { saveAs } from 'file-saver';
 
+interface ErrorCorreccion {
+  original: string;
+  correccion: string;
+  motivo: string;
+  posicion?: number;
+}
+
+interface ResultadoFragmento {
+  fragmento_num: number;
+  errores: ErrorCorreccion[];
+  texto_corregido: string;
+}
 
 @Component({
   selector: 'app-style-customization',
@@ -17,160 +29,278 @@ import { saveAs } from 'file-saver';
   styleUrls: ['./style-customization.css'],
 })
 export class StyleCustomization implements OnInit {
-
-
   documentContent: string = '';
-
   documentContentHTML: SafeHtml = '';
-
-
   resultadoCorreccion: any = null;
-
   loading = false;
-
   errorPercent = 0;
+  
+  // Control de progreso
+  progreso = 0;
+  fragmentoActual = 0;
+  totalFragmentos = 0;
+  
+  // Almacenar todos los errores y texto corregido
+  todosLosErrores: ErrorCorreccion[] = [];
+  textoCorregidoCompleto: string = '';
 
-constructor(
-  private correctorService: CorrectorService,
-  private sanitizer: DomSanitizer,
-  private cdr: ChangeDetectorRef
-) {}
+  constructor(
+    private correctorService: CorrectorService,
+    private sanitizer: DomSanitizer,
+    private cdr: ChangeDetectorRef
+  ) {}
 
+  ngOnInit(): void {
+    const content = localStorage.getItem('uploadedDocument');
+    this.documentContent = content || 'No se encontró ningún documento cargado.';
+    this.documentContentHTML = this.documentContent;
+    this.calcularPorcentaje();
+  }
 
-ngOnInit(): void {
-  const content = localStorage.getItem('uploadedDocument');
+  /**
+   * Divide el texto en fragmentos de tamaño máximo
+   */
+  dividirTextoEnFragmentos(texto: string, tamanioMaximo: number = 3000): string[] {
+    const palabras = texto.split(/\s+/);
+    const fragmentos: string[] = [];
+    let fragmentoActual: string[] = [];
+    let longitudActual = 0;
 
-  this.documentContent = content
-    ? content
-    : 'No se encontró ningún documento cargado.';
+    for (const palabra of palabras) {
+      const nuevaLongitud = longitudActual + palabra.length + 1;
+      
+      if (nuevaLongitud > tamanioMaximo && fragmentoActual.length > 0) {
+        fragmentos.push(fragmentoActual.join(' '));
+        fragmentoActual = [palabra];
+        longitudActual = palabra.length;
+      } else {
+        fragmentoActual.push(palabra);
+        longitudActual = nuevaLongitud;
+      }
+    }
 
-  this.documentContentHTML = this.documentContent;
+    if (fragmentoActual.length > 0) {
+      fragmentos.push(fragmentoActual.join(' '));
+    }
 
-  this.calcularPorcentaje();
-}
+    return fragmentos;
+  }
 
-
-  // 🚀 Ejecutar corrección con IA
+  /**
+   * Procesa el documento completo por fragmentos
+   */
   corregirDocumento(): void {
     if (!this.documentContent || this.loading) return;
 
     this.loading = true;
+    this.progreso = 0;
+    this.fragmentoActual = 0;
     this.errorPercent = 0;
     this.resultadoCorreccion = null;
+    this.todosLosErrores = [];
+    this.textoCorregidoCompleto = '';
 
-    this.correctorService
-      .analizarDocumento(this.documentContent)
+    // Dividir documento en fragmentos
+    const fragmentos = this.dividirTextoEnFragmentos(this.documentContent, 3000);
+    this.totalFragmentos = fragmentos.length;
+
+    console.log(`📄 Documento dividido en ${this.totalFragmentos} fragmentos`);
+
+    // Procesar fragmentos secuencialmente
+    this.procesarFragmentosSecuencialmente(fragmentos, 0);
+  }
+
+  /**
+   * Procesa los fragmentos uno por uno de forma secuencial
+   */
+  private procesarFragmentosSecuencialmente(fragmentos: string[], indice: number): void {
+    if (indice >= fragmentos.length) {
+      // Todos los fragmentos procesados
+      this.finalizarCorreccion();
+      return;
+    }
+
+    this.fragmentoActual = indice + 1;
+    this.progreso = Math.round((this.fragmentoActual / this.totalFragmentos) * 100);
+
+    console.log(`🔄 Procesando fragmento ${this.fragmentoActual}/${this.totalFragmentos}`);
+
+    this.correctorService.analizarDocumento(fragmentos[indice])
       .pipe(
-        timeout(90000), // ⏱ máximo 90s
         finalize(() => {
-          this.loading = false;
-          this.cdr.detectChanges(); 
+          this.cdr.detectChanges();
         })
       )
       .subscribe({
         next: (res: any) => {
-
-          if (typeof res === 'string') {
-            try {
-              res = JSON.parse(res);
-            } catch {
-              console.warn('La respuesta no es JSON válido');
-              return;
+          const resultado = this.parsearRespuesta(res);
+          
+          if (resultado) {
+            // Acumular errores
+            if (resultado.errores && Array.isArray(resultado.errores)) {
+              this.todosLosErrores.push(...resultado.errores);
+            }
+            
+            // Acumular texto corregido
+            if (resultado.corregido || resultado.texto_corregido) {
+              this.textoCorregidoCompleto += (this.textoCorregidoCompleto ? ' ' : '') + 
+                                            (resultado.corregido || resultado.texto_corregido);
             }
           }
 
-          this.resultadoCorreccion = res;
-
-           
-          this.marcarErrores();
-          this.cdr.detectChanges();
-          this.calcularPorcentaje();
-
+          // Procesar siguiente fragmento
+          this.procesarFragmentosSecuencialmente(fragmentos, indice + 1);
         },
         error: (err) => {
-          console.error('Error en la corrección:', err);
+          console.error(`❌ Error en fragmento ${indice + 1}:`, err);
+          
+          // Continuar con el siguiente fragmento aunque haya error
+          this.procesarFragmentosSecuencialmente(fragmentos, indice + 1);
         }
       });
   }
 
-marcarErrores(): void {
-  if (!this.documentContent) {
-    console.warn('documentContent vacío');
-    return;
-  }else{
-    console.log('documentContent:', this.documentContent);
+  /**
+   * Finaliza el proceso de corrección
+   */
+  private finalizarCorreccion(): void {
+    this.loading = false;
+    this.progreso = 100;
+
+    // Crear resultado consolidado
+    this.resultadoCorreccion = {
+      errores: this.todosLosErrores,
+      corregido: this.textoCorregidoCompleto || this.documentContent,
+      total_errores: this.todosLosErrores.length
+    };
+
+    console.log(`✅ Corrección completada. Total errores: ${this.todosLosErrores.length}`);
+
+    this.marcarErrores();
+    this.calcularPorcentaje();
+    this.cdr.detectChanges();
   }
 
-  let texto = this.documentContent;
-
-  if (!this.resultadoCorreccion?.errores?.length) {
-    this.documentContentHTML =
-      this.sanitizer.bypassSecurityTrustHtml(texto);
-    return;
+  /**
+   * Parsea la respuesta del servicio
+   */
+  private parsearRespuesta(res: any): any {
+    if (typeof res === 'string') {
+      try {
+        return JSON.parse(res);
+      } catch {
+        console.warn('La respuesta no es JSON válido');
+        return null;
+      }
+    }
+    return res;
   }
 
-  this.resultadoCorreccion.errores.forEach((err: any) => {
-    if (!err.original) return;
+  /**
+   * Marca errores en el texto con HTML
+   */
+  marcarErrores(): void {
+    if (!this.documentContent) {
+      console.warn('documentContent vacío');
+      return;
+    }
 
-    const palabra = err.original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(${palabra})`, 'gi');
+    let texto = this.documentContent;
 
-    texto = texto.replace(
-      regex,
-      `<span class="error"
-        title="Corrección: ${err.correccion || ''} ${err.motivo || ''}">
-        $1
-      </span>`
+    if (!this.todosLosErrores?.length) {
+      this.documentContentHTML = this.sanitizer.bypassSecurityTrustHtml(texto);
+      return;
+    }
+
+    // Ordenar errores por longitud (más largos primero) para evitar reemplazos parciales
+    const erroresOrdenados = [...this.todosLosErrores].sort((a, b) => 
+      (b.original?.length || 0) - (a.original?.length || 0)
     );
-  });
 
-  this.documentContentHTML =
-    this.sanitizer.bypassSecurityTrustHtml(texto);
-}
+    erroresOrdenados.forEach((err: ErrorCorreccion) => {
+      if (!err.original) return;
 
+      const palabra = err.original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`\\b(${palabra})\\b`, 'gi');
 
+      texto = texto.replace(
+        regex,
+        `<span class="error" title="Corrección: ${err.correccion || ''} - ${err.motivo || ''}">$1</span>`
+      );
+    });
 
-calcularPorcentaje(): void {
-  const texto = this.documentContent?.trim() || '';
-
-  if (!texto) {
-    this.errorPercent = 0;
-    return;
+    this.documentContentHTML = this.sanitizer.bypassSecurityTrustHtml(texto);
   }
 
-  const palabras = texto.split(/\s+/).length;
+  /**
+   * Calcula el porcentaje de errores
+   */
+  calcularPorcentaje(): void {
+    const texto = this.documentContent?.trim() || '';
 
-  if (!this.resultadoCorreccion?.errores) {
-    this.errorPercent = Math.min(100, Math.round(palabras * 0.5));
-    return;
+    if (!texto) {
+      this.errorPercent = 0;
+      return;
+    }
+
+    const palabras = texto.split(/\s+/).length;
+
+    if (!this.todosLosErrores?.length) {
+      this.errorPercent = 0;
+      return;
+    }
+
+    this.errorPercent = Math.min(
+      100,
+      Math.round((this.todosLosErrores.length / palabras) * 100)
+    );
   }
 
-  const errores = this.resultadoCorreccion.errores.length;
+  /**
+   * Descarga el documento corregido en formato DOCX
+   */
+  descargarDocumentoCorregido(): void {
+    if (!this.textoCorregidoCompleto && !this.resultadoCorreccion?.corregido) {
+      alert('No hay documento corregido disponible');
+      return;
+    }
 
-  this.errorPercent = Math.min(
-    100,
-    Math.round((errores / palabras) * 100)
-  );
-}
+    const textoFinal = this.textoCorregidoCompleto || this.resultadoCorreccion.corregido;
 
+    const doc = new Document({
+      sections: [
+        {
+          children: textoFinal
+            .split('\n')
+            .map((line: string) => new Paragraph({
+              children: [new TextRun(line)]
+            })),
+        },
+      ],
+    });
 
+    Packer.toBlob(doc).then(blob => {
+      saveAs(blob, `documento-corregido-${new Date().getTime()}.docx`);
+    });
+  }
 
-descargarDocumentoCorregido(): void {
-  if (!this.resultadoCorreccion?.corregido) return;
+  /**
+   * Descarga el reporte de errores en formato JSON
+   */
+  descargarReporteErrores(): void {
+    if (!this.todosLosErrores?.length) {
+      alert('No hay errores para descargar');
+      return;
+    }
 
-  const doc = new Document({
-    sections: [
-      {
-        children: this.resultadoCorreccion.corregido
-          .split('\n')
-          .map((line: string) => new Paragraph(line)),
-      },
-    ],
-  });
+    const reporte = {
+      fecha: new Date().toISOString(),
+      total_errores: this.todosLosErrores.length,
+      porcentaje_error: this.errorPercent,
+      errores: this.todosLosErrores
+    };
 
-  Packer.toBlob(doc).then(blob => {
-    saveAs(blob, 'documento-corregido.docx');
-  });
-}
-
+    const blob = new Blob([JSON.stringify(reporte, null, 2)], { type: 'application/json' });
+    saveAs(blob, `reporte-errores-${new Date().getTime()}.json`);
+  }
 }
