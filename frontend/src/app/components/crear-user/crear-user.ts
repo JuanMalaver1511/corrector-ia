@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Navbar } from '../navbar/navbar';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 interface User {
   id: number;
@@ -12,7 +12,7 @@ interface User {
 
 @Component({
   selector: 'app-crear-user',
-  imports: [Navbar, CommonModule, ReactiveFormsModule],
+  imports: [Navbar, CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './crear-user.html',
   styleUrl: './crear-user.css',
 })
@@ -24,6 +24,13 @@ export class CrearUser {
   mostrarConfirmPassword = false;
   mensajeExito = '';
   mensajeError = '';
+  
+  // Control de acceso
+  passwordAcceso = '';
+  mostrarPasswordAcceso = false;
+  accesoAutorizado = false;
+  errorAcceso = '';
+  private readonly PASSWORD_CORRECTA = 'AdminUser1234';
 
   constructor(private fb: FormBuilder) {
     this.userForm = this.fb.group({
@@ -34,7 +41,31 @@ export class CrearUser {
       validators: this.passwordMatchValidator
     });
 
-    this.cargarUsuarios();
+    this.verificarAccesoPrevio();
+  }
+
+  verificarAccesoPrevio(): void {
+    const acceso = sessionStorage.getItem('accesoAutorizado');
+    if (acceso === 'true') {
+      this.accesoAutorizado = true;
+      this.cargarUsuarios();
+    }
+  }
+
+  verificarAcceso(): void {
+    if (this.passwordAcceso === this.PASSWORD_CORRECTA) {
+      this.accesoAutorizado = true;
+      this.errorAcceso = '';
+      sessionStorage.setItem('accesoAutorizado', 'true');
+      this.cargarUsuarios();
+    } else {
+      this.errorAcceso = 'Contraseña incorrecta';
+      this.passwordAcceso = '';
+    }
+  }
+
+  toggleMostrarPasswordAcceso(): void {
+    this.mostrarPasswordAcceso = !this.mostrarPasswordAcceso;
   }
 
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {

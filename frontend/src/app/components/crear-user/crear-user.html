@@ -1,6 +1,44 @@
 <app-navbar></app-navbar>
 
-<div class="container">
+<!-- Pantalla de acceso -->
+<div class="acceso-container" *ngIf="!accesoAutorizado">
+  <div class="acceso-card">
+    <div class="acceso-icono">🔒</div>
+    <h2>Acceso Restringido</h2>
+    <p>Ingresa la contraseña de administrador para continuar</p>
+    
+    <form (submit)="verificarAcceso(); $event.preventDefault()">
+      <div class="form-group">
+        <label for="passwordAcceso">Contraseña de Acceso</label>
+        <div class="password-wrapper">
+          <input 
+            [type]="mostrarPasswordAcceso ? 'text' : 'password'" 
+            class="form-control" 
+            id="passwordAcceso" 
+            [(ngModel)]="passwordAcceso"
+            name="passwordAcceso"
+            [class.input-error]="errorAcceso"
+            placeholder="Ingresa la contraseña"
+            autofocus>
+          <button 
+            type="button" 
+            class="toggle-password" 
+            (click)="toggleMostrarPasswordAcceso()">
+            {{ mostrarPasswordAcceso ? '👁️' : '👁️‍🗨️' }}
+          </button>
+        </div>
+        <div class="error-message" *ngIf="errorAcceso">
+          {{ errorAcceso }}
+        </div>
+      </div>
+      
+      <button type="submit" class="btn btn-primary">Ingresar</button>
+    </form>
+  </div>
+</div>
+
+<!-- Contenido principal (solo visible después de autenticación) -->
+<div class="container" *ngIf="accesoAutorizado">
   <!-- Mensajes de éxito y error -->
   <div *ngIf="mensajeExito" class="mensaje mensaje-exito">
     {{ mensajeExito }}
