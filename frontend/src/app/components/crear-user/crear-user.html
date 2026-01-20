@@ -1,0 +1,126 @@
+<app-navbar></app-navbar>
+
+<div class="container">
+  <!-- Mensajes de éxito y error -->
+  <div *ngIf="mensajeExito" class="mensaje mensaje-exito">
+    {{ mensajeExito }}
+  </div>
+  <div *ngIf="mensajeError" class="mensaje mensaje-error">
+    {{ mensajeError }}
+  </div>
+
+  <div class="row">
+    <!-- Formulario de Creación -->
+    <div class="col-md-5">
+      <div class="card">
+        <h2>Crear Usuario</h2>
+        <form [formGroup]="userForm" (ngSubmit)="crearUsuario()">
+          
+          <div class="form-group">
+            <label for="usuario">Usuario</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="usuario" 
+              formControlName="usuario"
+              [class.input-error]="usuario?.invalid && usuario?.touched"
+              placeholder="Ingresa el nombre de usuario">
+            <div class="error-message" *ngIf="usuario?.invalid && usuario?.touched">
+              <span *ngIf="usuario?.errors?.['required']">El usuario es requerido</span>
+              <span *ngIf="usuario?.errors?.['minlength']">Mínimo 3 caracteres</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <div class="password-wrapper">
+              <input 
+                [type]="mostrarPassword ? 'text' : 'password'" 
+                class="form-control" 
+                id="password" 
+                formControlName="password"
+                [class.input-error]="password?.invalid && password?.touched"
+                placeholder="Ingresa la contraseña">
+              <button 
+                type="button" 
+                class="toggle-password" 
+                (click)="toggleMostrarPassword()">
+                {{ mostrarPassword ? '👁️' : '👁️‍🗨️' }}
+              </button>
+            </div>
+            <div class="error-message" *ngIf="password?.invalid && password?.touched">
+              <span *ngIf="password?.errors?.['required']">La contraseña es requerida</span>
+              <span *ngIf="password?.errors?.['minlength']">Mínimo 6 caracteres</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirmar Contraseña</label>
+            <div class="password-wrapper">
+              <input 
+                [type]="mostrarConfirmPassword ? 'text' : 'password'" 
+                class="form-control" 
+                id="confirmPassword" 
+                formControlName="confirmPassword"
+                [class.input-error]="(confirmPassword?.invalid && confirmPassword?.touched) || (userForm.errors?.['passwordMismatch'] && confirmPassword?.touched)"
+                placeholder="Confirma la contraseña">
+              <button 
+                type="button" 
+                class="toggle-password" 
+                (click)="toggleMostrarConfirmPassword()">
+                {{ mostrarConfirmPassword ? '👁️' : '👁️‍🗨️' }}
+              </button>
+            </div>
+            <div class="error-message" *ngIf="confirmPassword?.touched">
+              <span *ngIf="confirmPassword?.errors?.['required']">Debes confirmar la contraseña</span>
+              <span *ngIf="userForm.errors?.['passwordMismatch'] && !confirmPassword?.errors?.['required']">
+                Las contraseñas no coinciden
+              </span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Crear Usuario</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Lista de Usuarios -->
+    <div class="col-md-7">
+      <div class="card">
+        <h2>Usuarios Registrados</h2>
+        
+        <div *ngIf="usuarios.length === 0" class="empty-state">
+          <p>No hay usuarios registrados aún</p>
+        </div>
+
+        <div class="usuarios-lista" *ngIf="usuarios.length > 0">
+          <div class="usuario-item" *ngFor="let usuario of usuarios" [class.suspendido]="usuario.estado === 'suspendido'">
+            <div class="usuario-info">
+              <div class="usuario-nombre">{{ usuario.usuario }}</div>
+              <div class="usuario-detalles">
+                <span class="fecha">{{ usuario.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</span>
+                <span class="estado" [class.estado-activo]="usuario.estado === 'activo'" [class.estado-suspendido]="usuario.estado === 'suspendido'">
+                  {{ usuario.estado }}
+                </span>
+              </div>
+            </div>
+            <div class="usuario-acciones">
+              <button 
+                class="btn-icon btn-toggle" 
+                (click)="toggleEstado(usuario)"
+                [title]="usuario.estado === 'activo' ? 'Suspender' : 'Activar'">
+                {{ usuario.estado === 'activo' ? '⏸' : '▶' }}
+              </button>
+              <button 
+                class="btn-icon btn-delete" 
+                (click)="eliminarUsuario(usuario.id)"
+                title="Eliminar">
+                🗑️
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -10,6 +10,7 @@ import { Paraphraser } from './components/paraphraser/paraphraser';
 import { Profile } from './components/profile/profile';
 import { Settings } from './components/settings/settings';
 import { AuthGuard } from './guards/auth-guard';
+import { CrearUser } from './components/crear-user/crear-user';
 
 export const routes: Routes = [
   {
@@ -58,6 +59,11 @@ export const routes: Routes = [
   { 
     path: 'settings',
     component: Settings,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'crear-user',
+    component: CrearUser,
     canActivate: [AuthGuard]
   },
 
