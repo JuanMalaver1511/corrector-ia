@@ -146,13 +146,13 @@ label {
 }
 
 .btn-primary {
-  background-color: #3b82f6;
+  background-color: #2f41a3 ;
   color: white;
   width: 100%;
 }
 
 .btn-primary:hover {
-  background-color: #2563eb;
+  background-color: #3a4ebb ;
 }
 
 .btn-primary:active {
