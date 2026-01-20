@@ -61,7 +61,7 @@ ngOnInit(): void {
     this.correctorService
       .analizarDocumento(this.documentContent)
       .pipe(
-        timeout(60000), // ⏱ máximo 60s
+        timeout(90000), // ⏱ máximo 90s
         finalize(() => {
           this.loading = false;
           this.cdr.detectChanges(); 
