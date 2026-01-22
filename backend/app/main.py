@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import upload, ia
 from dotenv import load_dotenv
-from bd.models import create_table_users
+
 
 load_dotenv()
 
@@ -23,6 +23,4 @@ app.include_router(ia.router)
 def root():
     return {"message": "Backend IA funcionandoo"}
 
-@app.on_event("startup")
-def startup():
-    create_table_users()
+
