@@ -20,6 +20,10 @@ export class StyleEditor {
   isDragging = false;
   selectedFile: File | null = null;
   isLoading = false;
+intentosRestantes = Number(localStorage.getItem('intentosSubida')) || 3;
+
+
+
 
   // ---------------------------
   // EVENTOS DEL DRAG & DROP
@@ -35,47 +39,69 @@ export class StyleEditor {
     this.isDragging = false;
   }
 
-  onDrop(event: DragEvent) {
-    event.preventDefault();
-    this.isDragging = false;
+onDrop(event: DragEvent) {
+  event.preventDefault();
+  this.isDragging = false;
 
-    if (event.dataTransfer?.files.length) {
-      this.selectedFile = event.dataTransfer.files[0];
-      this.processFile(this.selectedFile);
-    }
-  }
+  if (!this.puedeSubirArchivo()) return;
 
-  onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0] ?? null;
-
-    if (!this.selectedFile) {
-      alert('No se ha seleccionado ningún archivo');
-      return;
-    }
-
+  if (event.dataTransfer?.files.length) {
+    this.selectedFile = event.dataTransfer.files[0];
     this.processFile(this.selectedFile);
   }
+}
+
+
+
+ngOnInit() {
+  const guardados = localStorage.getItem('intentosSubida');
+
+  if (guardados === null) {
+    localStorage.setItem('intentosSubida', '3');
+    this.intentosRestantes = 3;
+  } else {
+    this.intentosRestantes = Number(guardados);
+  }
+}
+
+
+onFileSelected(event: any) {
+  if (!this.puedeSubirArchivo()) {
+    event.target.value = '';
+    return;
+  }
+
+  this.selectedFile = event.target.files[0] ?? null;
+  if (!this.selectedFile) return;
+
+  this.processFile(this.selectedFile);
+}
+
+
+
 
   // ---------------------------
   // PROCESAR ARCHIVO
   // ---------------------------
 
-  processFile(file: File) {
-    this.isLoading = true;
+processFile(file: File) {
+  if (!this.puedeSubirArchivo()) return;
 
-    const type = file.type.toLowerCase();
-    const name = file.name.toLowerCase();
+  this.reducirIntentos();
+  this.isLoading = true;
 
-    if (type.includes("pdf")) {
-      this.extractPdfText(file);
+  const type = file.type.toLowerCase();
+  const name = file.name.toLowerCase();
 
-    } else if (name.endsWith(".docx") || type.includes("word")) {
-      this.extractWordText(file);
-
-    } else {
-      this.extractTextFile(file);
-    }
+  if (type.includes('pdf')) {
+    this.extractPdfText(file);
+  } else if (name.endsWith('.docx') || type.includes('word')) {
+    this.extractWordText(file);
+  } else {
+    this.extractTextFile(file);
   }
+}
+
 
   // ---------------------------
   // EXTRAER TEXTO DE TXT
@@ -148,4 +174,23 @@ export class StyleEditor {
       this.router.navigate(['/style-customization']);
     }, 1000);
   }
+
+
+reducirIntentos() {
+  this.intentosRestantes--;
+  localStorage.setItem('intentosSubida', this.intentosRestantes.toString());
+}
+
+puedeSubirArchivo(): boolean {
+  const intentos = Number(localStorage.getItem('intentosSubida')) || 0;
+
+  if (intentos <= 0) {
+    console.log('No puedes subir más archivos');
+    alert('Has agotado todos tus intentos.');
+    return false;
+  }
+
+  return true;
+}
+
 }
