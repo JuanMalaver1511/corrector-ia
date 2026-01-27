@@ -34,7 +34,7 @@
     "docs": "^0.3.2-canary.0",
     "file-saver": "^2.0.5",
     "mammoth": "^1.11.0",
-    "pdfjs-dist": "^5.4.449",
+    "pdfjs-dist": "^5.4.530",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
