@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { NgZone } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { finalize } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 
 import * as mammoth from "mammoth";

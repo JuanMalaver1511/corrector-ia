@@ -4,7 +4,7 @@ import { Navbar } from "../navbar/navbar";
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Loading } from '../loading/loading';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-questionnaires',
