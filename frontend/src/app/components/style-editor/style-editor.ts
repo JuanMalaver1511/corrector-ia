@@ -5,7 +5,11 @@ import { CommonModule } from '@angular/common';
 import { Loading } from '../loading/loading';
 
 import * as mammoth from "mammoth";        // Word extractor
-import * as pdfjsLib from "pdfjs-dist";    // PDF extractor
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf"; // PDF extractor
+
+(pdfjsLib as any).GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.js';
+
 
 @Component({
   selector: 'app-style-editor',
