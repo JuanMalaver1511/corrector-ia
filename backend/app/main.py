@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import upload, ia
+from routers import upload, ia
 from dotenv import load_dotenv
 
 
