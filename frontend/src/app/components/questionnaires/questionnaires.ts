@@ -4,6 +4,7 @@ import { Navbar } from "../navbar/navbar";
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Loading } from '../loading/loading';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-questionnaires',
@@ -19,7 +20,7 @@ import { Loading } from '../loading/loading';
 })
 export class Questionnaires {
 
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = environment.apiUrl;
 
   prompt: string = '';
   result: string = '';
