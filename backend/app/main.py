@@ -18,6 +18,7 @@ app.add_middleware(
 
 app.include_router(upload.router)
 app.include_router(ia.router)
+app.include_router(export.router)
 
 @app.get("/")
 def root():
