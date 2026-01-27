@@ -7,6 +7,8 @@ import { HttpClient } from '@angular/common/http';
 import { NgZone } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { finalize } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
+
 
 import * as mammoth from "mammoth";
 import * as pdfjsLib from "pdfjs-dist";
@@ -44,7 +46,7 @@ parafrasear() {
   this.isParaphraseOk = false;
   console.log('📡 Enviando texto a IA...');
 
-  this.http.post<any>('http://localhost:8000/ia/paraphrase', {
+  this.http.post<any>(`${environment.apiUrl}/ia/paraphrase`, {
     texto: this.paraphrasedText
   })
   .pipe(
