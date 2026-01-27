@@ -259,30 +259,21 @@ export class StyleCustomization implements OnInit {
   /**
    * Descarga el documento corregido en formato DOCX
    */
-  descargarDocumentoCorregido(): void {
-    if (!this.textoCorregidoCompleto && !this.resultadoCorreccion?.corregido) {
-      alert('No hay documento corregido disponible');
-      return;
-    }
+descargarDocumentoCorregido(): void {
+  const textoFinal =
+    this.textoCorregidoCompleto || this.resultadoCorreccion?.corregido;
 
-    const textoFinal = this.textoCorregidoCompleto || this.resultadoCorreccion.corregido;
-
-    const doc = new Document({
-      sections: [
-        {
-          children: textoFinal
-            .split('\n')
-            .map((line: string) => new Paragraph({
-              children: [new TextRun(line)]
-            })),
-        },
-      ],
-    });
-
-    Packer.toBlob(doc).then(blob => {
-      saveAs(blob, `documento-corregido-${new Date().getTime()}.docx`);
-    });
+  if (!textoFinal) {
+    alert('No hay documento corregido');
+    return;
   }
+
+  this.correctorService.descargarDocx(textoFinal)
+    .subscribe(blob => {
+      saveAs(blob, `documento-corregido-${Date.now()}.docx`);
+    });
+}
+
 
   /**
    * Descarga el reporte de errores en formato JSON
