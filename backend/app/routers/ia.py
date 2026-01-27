@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from app.ia.pipeline import procesar_texto
-from app.ia.openai_client import generar_cuestionario
-from app.ia.openai_client import parafrasear_texto
+from ia.pipeline import procesar_texto
+from ia.openai_client import generar_cuestionario
+from ia.openai_client import parafrasear_texto
 
 router = APIRouter(prefix="/ia", tags=["IA"])
 
