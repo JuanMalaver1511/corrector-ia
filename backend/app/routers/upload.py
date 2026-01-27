@@ -1,6 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
-from app.services.pdf_reader import read_pdf
-from app.services.word_reader import read_word
+from services.pdf_reader import read_pdf
+from services.word_reader import read_word
 
 router = APIRouter(prefix="/upload", tags=["Upload"])
 
