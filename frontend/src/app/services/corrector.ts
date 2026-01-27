@@ -15,4 +15,11 @@ export class CorrectorService {
   analizarDocumento(texto: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/ia/corregir`, { texto });
   }
+  descargarDocx(texto: string) {
+  return this.http.post(
+    `${this.apiUrl}/export/docx`,
+    { texto },
+    { responseType: 'blob' }
+  );
+}
 }
