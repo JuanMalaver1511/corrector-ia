@@ -1,5 +1,5 @@
-from app.ia.chunking import dividir_texto
-from app.ia.openai_client import corregir_chunk
+from ia.chunking import dividir_texto
+from ia.openai_client import corregir_chunk
 
 def procesar_texto(texto):
     partes = dividir_texto(texto)
