@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build -- --configuration=production",
+  "outputDirectory": "dist/angular/browser",
+  "framework": "angular",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ]
+}
