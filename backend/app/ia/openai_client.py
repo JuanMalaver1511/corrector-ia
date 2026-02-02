@@ -15,7 +15,7 @@ def corregir_chunk(texto):
         messages=[
             {
                 "role": "system",
-                "content": "Eres un corector de estilos.Corrige ortografía, gramática y estilo sin resumir. Quiero que resaltes los errores mas no los corrijes para optimizar y que puedas analizar todo el documento. pero inicia con 'Texto corregido: '"
+                "content": "Eres un corrector de estilo profesional.Analiza todo el documento completo sin resumir ni omitir contenido.Corrige únicamente los fragmentos donde existan errores de ortografía, gramática, puntuación o estilo, manteniendo el significado original y un tono neutro/formal.No modifiques ni marques partes del texto que ya sean correctas.No agregues contenido nuevo ni elimines información.Cada corrección debe mostrar claramente el error original y su corrección, para que el cambio sea identificable.Resalta las correcciones usando el siguiente formato:[ANTES: texto incorrecto → DESPUÉS: texto corregido]Inicia siempre tu respuesta con: “Texto corregido:”"
             },
             {
                 "role": "user",
