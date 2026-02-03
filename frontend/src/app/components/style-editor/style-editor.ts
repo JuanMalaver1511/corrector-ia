@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Navbar } from '../navbar/navbar';
 import { CommonModule } from '@angular/common';
 import { Loading } from '../loading/loading';
+import { FormsModule } from '@angular/forms';
 
 import * as mammoth from "mammoth";        // Word extractor
 import * as pdfjsLib from 'pdfjs-dist';
@@ -13,11 +14,18 @@ import * as pdfjsLib from 'pdfjs-dist';
 
 @Component({
   selector: 'app-style-editor',
-  imports: [Navbar, CommonModule, Loading],
+  imports: [Navbar, CommonModule, Loading, FormsModule],
   templateUrl: './style-editor.html',
   styleUrl: './style-editor.css',
 })
 export class StyleEditor {
+
+    // ---------------------------
+  // TEXTO + CONTADOR DE PALABRAS
+  // ---------------------------
+  contenido: string = '';
+  maxPalabras: number = 2000;
+  palabrasActuales: number = 0;
 
   constructor(private router: Router) {}
 
@@ -197,4 +205,43 @@ puedeSubirArchivo(): boolean {
   return true;
 }
 
+  contarPalabras(): void {
+    if (!this.contenido) {
+      this.palabrasActuales = 0;
+      return;
+    }
+
+    let palabras = this.contenido
+      .trim()
+      .split(/\s+/)
+      .filter(p => p.length > 0);
+
+    if (palabras.length > this.maxPalabras) {
+      this.contenido = palabras
+        .slice(0, this.maxPalabras)
+        .join(' ');
+      palabras = palabras.slice(0, this.maxPalabras);
+    }
+
+    this.palabrasActuales = palabras.length;
+  }
+corregirTexto(): void {
+  if (!this.contenido || this.palabrasActuales === 0) {
+    return;
+  }
+
+  this.isLoading = true;
+
+  // Guardar texto del textarea
+  localStorage.setItem('uploadedDocument', this.contenido);
+
+  // Navegar
+  setTimeout(() => {
+    this.isLoading = false;
+    this.router.navigate(['/style-customization']);
+  }, 500);
 }
+
+
+}
+
