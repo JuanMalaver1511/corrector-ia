@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { CorrectorService } from '../../services/corrector';
 import { finalize } from 'rxjs/operators';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Document, Packer, Paragraph, TextRun } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx';
 import { saveAs } from 'file-saver';
 
 interface ErrorCorreccion {
@@ -15,10 +15,12 @@ interface ErrorCorreccion {
   posicion?: number;
 }
 
-interface ResultadoFragmento {
-  fragmento_num: number;
-  errores: ErrorCorreccion[];
-  texto_corregido: string;
+interface ElementoDocumento {
+  tipo: string;
+  texto: string;
+  negrita: boolean;
+  italica: boolean;
+  estilo: string;
 }
 
 @Component({
@@ -31,16 +33,15 @@ interface ResultadoFragmento {
 export class StyleCustomization implements OnInit {
   documentContent: string = '';
   documentContentHTML: SafeHtml = '';
+  documentStructure: ElementoDocumento[] = [];
   resultadoCorreccion: any = null;
   loading = false;
   errorPercent = 0;
   
-  // Control de progreso
   progreso = 0;
   fragmentoActual = 0;
   totalFragmentos = 0;
   
-  // Almacenar todos los errores y texto corregido
   todosLosErrores: ErrorCorreccion[] = [];
   textoCorregidoCompleto: string = '';
 
@@ -51,14 +52,36 @@ export class StyleCustomization implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Recuperar texto plano
     const content = localStorage.getItem('uploadedDocument');
     this.documentContent = content || 'No se encontró ningún documento cargado.';
-    this.documentContentHTML = this.documentContent;
+    
+    // Recuperar HTML con estilos
+    const htmlContent = localStorage.getItem('uploadedDocumentHTML');
+    
+    // Recuperar estructura del documento
+    const estructuraStr = localStorage.getItem('uploadedDocumentStructure');
+    if (estructuraStr) {
+      try {
+        this.documentStructure = JSON.parse(estructuraStr);
+      } catch (e) {
+        console.warn('No se pudo parsear la estructura del documento');
+      }
+    }
+    
+    // Mostrar HTML con estilos
+    if (htmlContent) {
+      this.documentContentHTML = this.sanitizer.bypassSecurityTrustHtml(htmlContent);
+    } else {
+      // Generar HTML básico del texto
+      const htmlBasico = this.documentContent
+        .split('\n')
+        .map(linea => linea.trim() ? `<p>${linea}</p>` : '')
+        .join('');
+      this.documentContentHTML = this.sanitizer.bypassSecurityTrustHtml(htmlBasico);
+    }
   }
 
-  /**
-   * Divide el texto en fragmentos de tamaño máximo
-   */
   dividirTextoEnFragmentos(texto: string, tamanioMaximo: number = 3000): string[] {
     const palabras = texto.split(/\s+/);
     const fragmentos: string[] = [];
@@ -85,9 +108,6 @@ export class StyleCustomization implements OnInit {
     return fragmentos;
   }
 
-  /**
-   * Procesa el documento completo por fragmentos
-   */
   corregirDocumento(): void {
     if (!this.documentContent || this.loading) return;
 
@@ -99,22 +119,16 @@ export class StyleCustomization implements OnInit {
     this.todosLosErrores = [];
     this.textoCorregidoCompleto = '';
 
-    // Dividir documento en fragmentos
     const fragmentos = this.dividirTextoEnFragmentos(this.documentContent, 3000);
     this.totalFragmentos = fragmentos.length;
 
     console.log(`📄 Documento dividido en ${this.totalFragmentos} fragmentos`);
 
-    // Procesar fragmentos secuencialmente
     this.procesarFragmentosSecuencialmente(fragmentos, 0);
   }
 
-  /**
-   * Procesa los fragmentos uno por uno de forma secuencial
-   */
   private procesarFragmentosSecuencialmente(fragmentos: string[], indice: number): void {
     if (indice >= fragmentos.length) {
-      // Todos los fragmentos procesados
       this.finalizarCorreccion();
       return;
     }
@@ -135,63 +149,45 @@ export class StyleCustomization implements OnInit {
           const resultado = this.parsearRespuesta(res);
           
           if (resultado) {
-            // Acumular errores
             if (resultado.errores && Array.isArray(resultado.errores)) {
               this.todosLosErrores.push(...resultado.errores);
             }
             
-            // Acumular texto corregido
             if (resultado.corregido || resultado.texto_corregido) {
               this.textoCorregidoCompleto += (this.textoCorregidoCompleto ? ' ' : '') + 
                                             (resultado.corregido || resultado.texto_corregido);
             }
           }
 
-          // Procesar siguiente fragmento
           this.procesarFragmentosSecuencialmente(fragmentos, indice + 1);
         },
         error: (err) => {
           console.error(`❌ Error en fragmento ${indice + 1}:`, err);
-          
-          // Continuar con el siguiente fragmento aunque haya error
           this.procesarFragmentosSecuencialmente(fragmentos, indice + 1);
         }
       });
   }
 
-  /**
-   * Finaliza el proceso de corrección
-   */
-private finalizarCorreccion(): void {
-  this.loading = false;
-  this.progreso = 100;
+  private finalizarCorreccion(): void {
+    this.loading = false;
+    this.progreso = 100;
 
-  console.log('🎯 FINALIZANDO CORRECCIÓN');
-  console.log('📊 todosLosErrores:', this.todosLosErrores);
-  console.log('📊 Cantidad de errores:', this.todosLosErrores.length);
-  console.log('📝 Texto corregido:', this.textoCorregidoCompleto.substring(0, 100));
+    console.log('🎯 FINALIZANDO CORRECCIÓN');
 
-  // Crear resultado consolidado
-  this.resultadoCorreccion = {
-    errores: this.todosLosErrores,
-    corregido: this.textoCorregidoCompleto || this.documentContent,
-    total_errores: this.todosLosErrores.length
-  };
+    this.resultadoCorreccion = {
+      errores: this.todosLosErrores,
+      corregido: this.textoCorregidoCompleto || this.documentContent,
+      total_errores: this.todosLosErrores.length
+    };
 
-  console.log('✅ Corrección completada. Total errores: ${this.todosLosErrores.length}');
+    console.log(`✅ Corrección completada. Total errores: ${this.todosLosErrores.length}`);
 
-  this.marcarErrores();
-  
-  console.log('🔢 LLAMANDO A calcularPorcentaje()');
-  this.calcularPorcentaje();
-  console.log('📊 errorPercent después de calcular:', this.errorPercent);
-  
-  this.cdr.detectChanges();
-}
+    this.marcarErrores();
+    this.calcularPorcentaje();
+    
+    this.cdr.detectChanges();
+  }
 
-  /**
-   * Parsea la respuesta del servicio
-   */
   private parsearRespuesta(res: any): any {
     if (typeof res === 'string') {
       try {
@@ -204,23 +200,22 @@ private finalizarCorreccion(): void {
     return res;
   }
 
-  /**
-   * Marca errores en el texto con HTML
-   */
   marcarErrores(): void {
-    if (!this.documentContent) {
-      console.warn('documentContent vacío');
-      return;
-    }
+    const htmlOriginal = localStorage.getItem('uploadedDocumentHTML') || '';
+    let html = htmlOriginal;
 
-    let texto = this.documentContent;
+    if (!html) {
+      html = this.documentContent
+        .split('\n')
+        .map(linea => linea.trim() ? `<p>${linea}</p>` : '')
+        .join('');
+    }
 
     if (!this.todosLosErrores?.length) {
-      this.documentContentHTML = this.sanitizer.bypassSecurityTrustHtml(texto);
+      this.documentContentHTML = this.sanitizer.bypassSecurityTrustHtml(html);
       return;
     }
 
-    // Ordenar errores por longitud (más largos primero) para evitar reemplazos parciales
     const erroresOrdenados = [...this.todosLosErrores].sort((a, b) => 
       (b.original?.length || 0) - (a.original?.length || 0)
     );
@@ -229,70 +224,156 @@ private finalizarCorreccion(): void {
       if (!err.original) return;
 
       const palabra = err.original.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(`\\b(${palabra})\\b`, 'gi');
+      const regex = new RegExp(`(>[^<]*)(\\b${palabra}\\b)([^<]*)`, 'gi');
 
-      texto = texto.replace(
+      html = html.replace(
         regex,
-        `<span class="error" title="Corrección: ${err.correccion || ''} - ${err.motivo || ''}">$1</span>`
+        `$1<span class="error" title="Corrección: ${err.correccion || ''} - ${err.motivo || ''}">$2</span>$3`
       );
     });
 
-    this.documentContentHTML = this.sanitizer.bypassSecurityTrustHtml(texto);
+    this.documentContentHTML = this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  calcularPorcentaje(): void {
+    const texto = this.documentContent?.trim() || '';
+
+    if (!texto) {
+      this.errorPercent = 0;
+      return;
+    }
+
+    const palabras = texto.split(/\s+/).length;
+
+    if (!this.todosLosErrores?.length) {
+      this.errorPercent = 0;
+      return;
+    }
+
+    this.errorPercent = Math.min(
+      100,
+      Math.round((this.todosLosErrores.length / palabras) * 100)
+    );
   }
 
   /**
-   * Calcula el porcentaje de errores
+   * Descarga el documento corregido preservando estilos de la estructura original
    */
-calcularPorcentaje(): void {
-  const texto = this.documentContent?.trim() || '';
+  descargarDocumentoCorregido(): void {
+    const textoFinal = this.textoCorregidoCompleto || this.resultadoCorreccion?.corregido;
 
-  if (!texto) {
-    console.log('❌ No hay texto');
-    this.errorPercent = 0;
-    return;
+    if (!textoFinal) {
+      alert('No hay documento corregido');
+      return;
+    }
+
+    try {
+      // Crear documento Word con la estructura original
+      const doc = this.crearDocumentoConEstilos(textoFinal);
+      
+      Packer.toBlob(doc).then(blob => {
+        const fecha = new Date().toISOString().split('T')[0];
+        saveAs(blob, `documento-corregido-${fecha}.docx`);
+      });
+    } catch (error) {
+      console.error('Error al crear documento:', error);
+      alert('Error al generar el documento Word');
+    }
   }
-
-  const palabras = texto.split(/\s+/).length;
-  console.log('📝 Total palabras:', palabras);
-
-  if (!this.todosLosErrores?.length) {
-    console.log('❌ No hay errores detectados');
-    this.errorPercent = 0;
-    return;
-  }
-
-  console.log('🔴 Total errores:', this.todosLosErrores.length);
-
-  this.errorPercent = Math.min(
-    100,
-    Math.round((this.todosLosErrores.length / palabras) * 100)
-  );
-  
-  console.log('📊 Porcentaje calculado:', this.errorPercent);
-}
 
   /**
-   * Descarga el documento corregido en formato DOCX
+   * Crea un documento Word preservando la estructura original
    */
-descargarDocumentoCorregido(): void {
-  const textoFinal =
-    this.textoCorregidoCompleto || this.resultadoCorreccion?.corregido;
+  private crearDocumentoConEstilos(textoCorregido: string): Document {
+    const paragraphs: Paragraph[] = [];
+    
+    if (this.documentStructure && this.documentStructure.length > 0) {
+      // Usar la estructura original
+      const lineasCorregidas = textoCorregido.split('\n');
+      let indiceLinea = 0;
+      
+      this.documentStructure.forEach(elemento => {
+        const textoElemento = lineasCorregidas[indiceLinea] || elemento.texto;
+        indiceLinea++;
+        
+        if (!textoElemento.trim()) return;
+        
+        const opciones: any = {
+          children: [
+            new TextRun({
+              text: textoElemento,
+              bold: elemento.negrita,
+              italics: elemento.italica,
+              size: this.getTamanoSegunTipo(elemento.tipo)
+            })
+          ],
+          spacing: { after: 200 }
+        };
+        
+        // Aplicar nivel de título
+        switch (elemento.tipo) {
+          case 'h1':
+            opciones.heading = HeadingLevel.HEADING_1;
+            break;
+          case 'h2':
+            opciones.heading = HeadingLevel.HEADING_2;
+            break;
+          case 'h3':
+            opciones.heading = HeadingLevel.HEADING_3;
+            break;
+        }
+        
+        paragraphs.push(new Paragraph(opciones));
+      });
+    } else {
+      // Sin estructura, crear párrafos simples
+      const lineas = textoCorregido.split('\n');
+      lineas.forEach(linea => {
+        if (linea.trim()) {
+          paragraphs.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: linea,
+                  size: 22 // 11pt
+                })
+              ],
+              spacing: { after: 200 }
+            })
+          );
+        }
+      });
+    }
 
-  if (!textoFinal) {
-    alert('No hay documento corregido');
-    return;
-  }
-
-  this.correctorService.descargarDocx(textoFinal)
-    .subscribe(blob => {
-      saveAs(blob, `documento-corregido-${Date.now()}.docx`);
+    return new Document({
+      sections: [{
+        properties: {
+          page: {
+            margin: {
+              top: 1440,    // 1 pulgada
+              right: 1440,
+              bottom: 1440,
+              left: 1440
+            }
+          }
+        },
+        children: paragraphs
+      }]
     });
-}
-
+  }
 
   /**
-   * Descarga el reporte de errores en formato JSON
+   * Obtiene el tamaño de fuente según el tipo de elemento
    */
+  private getTamanoSegunTipo(tipo: string): number {
+    switch (tipo) {
+      case 'h1': return 32; // 16pt
+      case 'h2': return 28; // 14pt
+      case 'h3': return 24; // 12pt
+      default: return 22;   // 11pt
+    }
+  }
+
   descargarReporteErrores(): void {
     if (!this.todosLosErrores?.length) {
       alert('No hay errores para descargar');
@@ -309,5 +390,4 @@ descargarDocumentoCorregido(): void {
     const blob = new Blob([JSON.stringify(reporte, null, 2)], { type: 'application/json' });
     saveAs(blob, `reporte-errores-${new Date().getTime()}.json`);
   }
-  
 }
