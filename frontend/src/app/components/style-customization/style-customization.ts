@@ -54,7 +54,6 @@ export class StyleCustomization implements OnInit {
     const content = localStorage.getItem('uploadedDocument');
     this.documentContent = content || 'No se encontró ningún documento cargado.';
     this.documentContentHTML = this.documentContent;
-    this.calcularPorcentaje();
   }
 
   /**
@@ -163,23 +162,32 @@ export class StyleCustomization implements OnInit {
   /**
    * Finaliza el proceso de corrección
    */
-  private finalizarCorreccion(): void {
-    this.loading = false;
-    this.progreso = 100;
+private finalizarCorreccion(): void {
+  this.loading = false;
+  this.progreso = 100;
 
-    // Crear resultado consolidado
-    this.resultadoCorreccion = {
-      errores: this.todosLosErrores,
-      corregido: this.textoCorregidoCompleto || this.documentContent,
-      total_errores: this.todosLosErrores.length
-    };
+  console.log('🎯 FINALIZANDO CORRECCIÓN');
+  console.log('📊 todosLosErrores:', this.todosLosErrores);
+  console.log('📊 Cantidad de errores:', this.todosLosErrores.length);
+  console.log('📝 Texto corregido:', this.textoCorregidoCompleto.substring(0, 100));
 
-    console.log(`✅ Corrección completada. Total errores: ${this.todosLosErrores.length}`);
+  // Crear resultado consolidado
+  this.resultadoCorreccion = {
+    errores: this.todosLosErrores,
+    corregido: this.textoCorregidoCompleto || this.documentContent,
+    total_errores: this.todosLosErrores.length
+  };
 
-    this.marcarErrores();
-    this.calcularPorcentaje();
-    this.cdr.detectChanges();
-  }
+  console.log('✅ Corrección completada. Total errores: ${this.todosLosErrores.length}');
+
+  this.marcarErrores();
+  
+  console.log('🔢 LLAMANDO A calcularPorcentaje()');
+  this.calcularPorcentaje();
+  console.log('📊 errorPercent después de calcular:', this.errorPercent);
+  
+  this.cdr.detectChanges();
+}
 
   /**
    * Parsea la respuesta del servicio
@@ -235,26 +243,33 @@ export class StyleCustomization implements OnInit {
   /**
    * Calcula el porcentaje de errores
    */
-  calcularPorcentaje(): void {
-    const texto = this.documentContent?.trim() || '';
+calcularPorcentaje(): void {
+  const texto = this.documentContent?.trim() || '';
 
-    if (!texto) {
-      this.errorPercent = 0;
-      return;
-    }
-
-    const palabras = texto.split(/\s+/).length;
-
-    if (!this.todosLosErrores?.length) {
-      this.errorPercent = 0;
-      return;
-    }
-
-    this.errorPercent = Math.min(
-      100,
-      Math.round((this.todosLosErrores.length / palabras) * 100)
-    );
+  if (!texto) {
+    console.log('❌ No hay texto');
+    this.errorPercent = 0;
+    return;
   }
+
+  const palabras = texto.split(/\s+/).length;
+  console.log('📝 Total palabras:', palabras);
+
+  if (!this.todosLosErrores?.length) {
+    console.log('❌ No hay errores detectados');
+    this.errorPercent = 0;
+    return;
+  }
+
+  console.log('🔴 Total errores:', this.todosLosErrores.length);
+
+  this.errorPercent = Math.min(
+    100,
+    Math.round((this.todosLosErrores.length / palabras) * 100)
+  );
+  
+  console.log('📊 Porcentaje calculado:', this.errorPercent);
+}
 
   /**
    * Descarga el documento corregido en formato DOCX
@@ -294,4 +309,5 @@ descargarDocumentoCorregido(): void {
     const blob = new Blob([JSON.stringify(reporte, null, 2)], { type: 'application/json' });
     saveAs(blob, `reporte-errores-${new Date().getTime()}.json`);
   }
+  
 }

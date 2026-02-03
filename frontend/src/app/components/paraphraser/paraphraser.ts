@@ -10,6 +10,7 @@ import { finalize } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 
+
 import * as mammoth from "mammoth";
 import * as pdfjsLib from "pdfjs-dist";
 
@@ -21,7 +22,12 @@ import * as pdfjsLib from "pdfjs-dist";
 })
 export class Paraphraser {
 
-  constructor(private http: HttpClient, private zone: NgZone, private cdRef: ChangeDetectorRef) { }
+constructor(
+  private http: HttpClient,
+  private zone: NgZone,
+  private cdRef: ChangeDetectorRef
+) {}
+
 
   paraphrasedText: string = '';
   originalText: string = '';
@@ -29,6 +35,13 @@ export class Paraphraser {
   selectedFile: File | null = null;
   isLoading = false;
   isParaphraseOk = false;
+
+      // ---------------------------
+  // TEXTO + CONTADOR DE PALABRAS
+  // ---------------------------
+  contenido: string = '';
+  maxPalabras: number = 2000;
+  palabrasActuales: number = 0;
 
   // ---------------------------
   // PARAFRASEAR IA

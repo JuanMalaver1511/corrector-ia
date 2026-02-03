@@ -2,9 +2,18 @@
 
 <!-- FLOTANTE DERECHA: PORCENTAJE -->
 <div class="floating-info" aria-label="Estado del documento">
-  <div class="error-circle" [ngStyle]="{ '--percent': errorPercent + '%' }" role="progressbar"
-    [attr.aria-valuenow]="errorPercent" aria-valuemin="0" aria-valuemax="100">
+  <div class="error-circle" 
+       [ngStyle]="{ '--percent': errorPercent + '%' }" 
+       role="progressbar"
+       [attr.aria-valuenow]="errorPercent" 
+       aria-valuemin="0" 
+       aria-valuemax="100">
     <span aria-live="polite">{{ errorPercent }}% Error</span>
+  </div>
+  
+  <!-- DEBUG: Muestra info adicional -->
+  <div style="font-size: 10px; margin-top: 5px;">
+    Errores: {{ todosLosErrores?.length || 0 }}
   </div>
 </div>
 
@@ -23,7 +32,7 @@
 <!-- VISOR DEL DOCUMENTO -->
 <div class="viewer-container">
   <div class="header">
-    <h1>Visualiza tu documento</h1>
+    <h1>Visualiza tu documento</h1><br>
     <p>Revisa el contenido extraído del archivo.</p>
   </div>
 
