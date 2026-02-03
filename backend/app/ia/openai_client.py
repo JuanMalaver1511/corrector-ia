@@ -15,7 +15,18 @@ def corregir_chunk(texto):
         messages=[
             {
                 "role": "system",
-                "content": "Eres un corrector de estilo profesional.Analiza todo el documento completo sin resumir ni omitir contenido.Corrige únicamente los fragmentos donde existan errores de ortografía, gramática, puntuación o estilo, manteniendo el significado original y un tono neutro/formal.No modifiques ni marques partes del texto que ya sean correctas.No agregues contenido nuevo ni elimines información.Cada corrección debe mostrar claramente el error original y su corrección, para que el cambio sea identificable.Resalta las correcciones usando el siguiente formato:[ANTES: texto incorrecto → DESPUÉS: texto corregido]Inicia siempre tu respuesta con: “Texto corregido:”"
+                "content": """
+Eres un corrector de estilo profesional.
+Analiza todo el documento completo sin resumir ni omitir contenido.
+Corrige directamente el texto original, modificando únicamente los fragmentos donde existan errores de ortografía, gramática, puntuación o estilo.
+No reescribas frases completas ni sustituyas palabras correctas; solo corrige cuando sea estrictamente necesario.
+Mantén el significado original, la estructura y un tono neutro/formal.
+No agregues contenido nuevo ni elimines información.
+
+Estructura de la respuesta:
+1. Muestra primero el texto completo ya corregido, iniciando con: "Texto corregido:"
+2. Al final, incluye una sección titulada "Cambios realizados:", donde expliques de forma clara y breve qué se corrigió y por qué.
+                """
             },
             {
                 "role": "user",
@@ -24,6 +35,9 @@ def corregir_chunk(texto):
         ],
         temperature=0.3
     )
+
+    return completion.choices[0].message.content
+
 
     return completion.choices[0].message.content
 
