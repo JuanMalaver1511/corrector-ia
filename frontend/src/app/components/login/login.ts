@@ -14,7 +14,7 @@ export class Login {
   constructor(private router: Router) {}
 login(usuario: string, password: string) {
   const userTest = 'juanma';
-  const passTest = '1234';
+  const passTest = '1234*';
 
   if (usuario === userTest && password === passTest) {
     this.errorMessage = '';
